@@ -17,4 +17,5 @@ public:
 		m_id = id;
 	}
 	virtual T evaluate() = 0;
+	virtual void collectInputs(std::vector<Node<T>*>& inputs) {}
 };

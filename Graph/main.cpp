@@ -5,18 +5,34 @@
 #include "Variable.h"
 #include "Graph.h"
 #include "Node.h"
+#include "Input.h"
+
+#include <Eigen/Dense>
 
 using namespace std;
+using namespace Eigen;
 
 int main(int argc, char ** argv) {
 	
-	Graph<Node<int>> g;
-	auto five = Variable<int>(g,5);
-	//auto three = Variable<int>(g,3);
-	//auto add1 = Add<int>(g, five, three);
-	//auto two = Variable<int>(g, 2);
-	//auto mult1 = Multiply<int>(g, two, add1);
-	cout << five.evaluate();
+	Matrix2f mat2;
+	mat2 << 1, 2, 3, 4;
+	Graph<Node<Matrix2f>> g;
+	auto five = Variable<Matrix2f>(g, mat2);
+	auto x = Input<Matrix2f>(g, mat2);
+	cout << x.getId() << endl;
+	auto add1 = Add<Matrix2f>(g, five, x);
+	Matrix<float, 1, 2> mat12;
+	mat12 << 1, 2;
+	auto two = Variable<Matrix<float,1,2>>(g, mat12);
+	auto mult1 = Multiply<Matrix2f>(g, two, add1);
+	cout << mult1.evaluate() << endl;
+	std::vector<Node<Matrix2f>*> inputs;
+	g.getInputs(mult1,inputs);
+	cout << "inputs: ";
+	for (auto i : inputs) {
+		cout << i->getId() << ", ";
+	}
+	//cout << add3.evaluate();
 	int temp;
 	cin >> temp;
 	return 0;

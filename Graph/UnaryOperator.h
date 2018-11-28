@@ -15,4 +15,7 @@ public:
 	T evaluate() {
 		return unaryOperation(m_node->evaluate());
 	}
+	void collectInputs(std::vector<Node<T>*>& inputs) {
+		m_child->collectInputs(inputs);
+	}
 };

@@ -17,4 +17,8 @@ public:
 	T evaluate() {
 		return binaryOperation(m_left->evaluate(), m_right->evaluate());
 	}
+	void collectInputs(std::vector<Node<T>*>& inputs) {
+		m_left->collectInputs(inputs);
+		m_right->collectInputs(inputs);
+	}
 };

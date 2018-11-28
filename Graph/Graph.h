@@ -23,6 +23,9 @@ public:
 	void addInput(Node* inputNode) {
 		m_inputMap[inputNode->getId()] = inputNode;
 	}
+	void getInputs(Node& node, std::vector<Node*>& inputs) {
+		node.collectInputs(inputs);
+	}
 	//type evaluate(Node* node) {
 	//	m_nodeMap[node->getId()].evaluate();
 	//}

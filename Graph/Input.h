@@ -16,4 +16,7 @@ public:
 	void setInput(T val) {
 		m_val = val;
 	}
+	void collectInputs(std::vector<Node<T>*>& inputs) {
+		inputs.push_back((Node<T>*)this);
+	}
 };
