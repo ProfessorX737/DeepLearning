@@ -1,32 +1,55 @@
 #include "Tensor.h"
 #include <cstdlib>
+#include <memory>
+#include <algorithm>
+#include "logging.h"
+#include <malloc.h>
+#include <stdio.h>
+#include <iostream>
 
-Tensor::Tensor(DataType dt, init_list dim_sizes) : dt_(dt) {
-	for (int64 s : dim_sizes) {
-		dims_.push_back(s);
+Tensor::Tensor(const std::vector<Index>& dims, DataType dt)
+	: dims_(std::move(dims)), dt_(dt), num_elements_(1) {
+	std::cout << "calling pass vector constructor" << std::endl;
+	CHECK_GT(dims_.size(), 0);
+	for (Eigen::Index s : dims_) {
+		CHECK_GE(s, 0);
+		num_elements_ *= s;
 	}
+	data_ = allocate(num_elements_*DataTypeSize(dt_));
 }
 
-template<typename T>
-Tensor::Tensor(const std::initializer_list<T>& v) {
-	dims_.push_back(1);
-	dt_ = DataTypeToEnum<T>::v();
-	num_elements_ = v.size();
-	data_ = ::operator new(sizeof(T)*num_elements);
-	std::copy_n(v.begin(), v.size(), static_cast<T*>(data_));
-}
-
-template<typename T>
-void* Tensor::Allocate(int num_elements) {
-	DCHECK_NE(num_elements, 0);
-	uint nbytes = sizeof(T)*num_elements;
-	void* ptr = std::aligned_alloc(ALIGNMENT, nbytes);
-	CHECK_NOT_NULL(ptr) << "Failed to allocate " << nbytes << " bytes";
-	return ptr;
+Tensor::Tensor(const dim_init_list& dims, DataType dt) 
+	: dims_(std::move(dims)), dt_(dt), num_elements_(1) {
+	CHECK_GT(dims_.size(), 0);
+	for (Eigen::Index s : dims_) {
+		CHECK_GE(s, 0);
+		num_elements_ *= s;
+	}
+	data_ = allocate(num_elements_*DataTypeSize(dt_));
+	std::vector<Index> dimz = std::move(dims);
 }
 
 Tensor::~Tensor() {
-	//TODO: implement reference counted buffer class so 
-	// multiple tensors can share the same data
 	if (data_) delete data_;
+}
+
+int Tensor::dimSize(int index) {
+	DCHECK_GE(index, 0);
+	DCHECK_LT(index, numDims());
+	return dims_[index];
+}
+
+void* Tensor::allocate(size_t num_bytes) {
+	CHECK_GT(num_bytes, 0);
+	void* ptr = nullptr;
+#if defined(_WIN32) || defined(WIN32)
+	ptr = _aligned_malloc(num_bytes, ALIGNMENT);
+#else
+	DCHECK_EQ(ALIGNMENT % sizeof(void*), 0);
+	DCHECK_POW2(ALIGNMENT);
+	CHECK_GE(ALIGNMENT, sizeof(void*));
+	if (posix_memalign(&ptr, ALIGNMENT, num_bytes)) ptr = nullptr;
+#endif
+	CHECK_NOT_NULL(ptr) << "Failed to allocate " << num_bytes << " bytes";
+	return ptr;
 }
