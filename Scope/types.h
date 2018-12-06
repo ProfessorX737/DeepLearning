@@ -14,6 +14,7 @@ typedef unsigned int uint32;
 typedef unsigned long long uint64;
 
 enum DataType {
+	DT_INVALID = 0,
 	DT_FLOAT = 1,
 	DT_DOUBLE = 2,
 	DT_INT64 = 3,

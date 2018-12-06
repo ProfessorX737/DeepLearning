@@ -7,40 +7,55 @@
 #include <stdio.h>
 #include <iostream>
 
-Tensor::Tensor(const std::vector<Index>& dims, DataType dt)
-	: dims_(std::move(dims)), dt_(dt), num_elements_(1) {
-	std::cout << "calling pass vector constructor" << std::endl;
-	CHECK_GT(dims_.size(), 0);
-	for (Eigen::Index s : dims_) {
-		CHECK_GE(s, 0);
-		num_elements_ *= s;
-	}
-	data_ = allocate(num_elements_*DataTypeSize(dt_));
+Tensor::Tensor() : Tensor({ 0 }, DT_INVALID) {}
+
+Tensor::Tensor(const TensorShape& shape, DataType dt) {
+	init(shape, dt);
 }
 
-Tensor::Tensor(const dim_init_list& dims, DataType dt) 
-	: dims_(std::move(dims)), dt_(dt), num_elements_(1) {
-	CHECK_GT(dims_.size(), 0);
-	for (Eigen::Index s : dims_) {
-		CHECK_GE(s, 0);
-		num_elements_ *= s;
+Tensor::Tensor(const dim_init_list& dims, DataType dt) {
+	init(dims, dt);
+}
+
+void Tensor::init(const TensorShape& shape, DataType dt) {
+	if (data_) delete data_;
+	shape_ = std::move(shape);
+	dt_ = dt;
+	data_ = allocate(numElements()*DataTypeSize(dt_));
+	owns_data_ = true;
+}
+
+void Tensor::init(const dim_init_list& dims, DataType dt) {
+	if (data_) delete data_;
+	shape_.init(dims);
+	dt_ = dt;
+	owns_data_ = true;
+	data_ = allocate(numElements()*DataTypeSize(dt_));
+}
+
+void Tensor::sharedCopyInit(const Tensor& other) {
+	sharedCopyInit(other, other.shape_);
+}
+
+void Tensor::sharedCopyInit(const Tensor& other, const TensorShape& shape) {
+	CHECK_EQ(shape.numElements(), other.numElements());
+	dt_ = other.dataType();
+	if (data_ != other.data_) {
+		if (data_) delete data_;
+		data_ = other.data_;
 	}
-	data_ = allocate(num_elements_*DataTypeSize(dt_));
-	std::vector<Index> dimz = std::move(dims);
+	shape_ = std::move(shape);
+	owns_data_ = false;
 }
 
 Tensor::~Tensor() {
-	if (data_) delete data_;
-}
-
-int Tensor::dimSize(int index) {
-	DCHECK_GE(index, 0);
-	DCHECK_LT(index, numDims());
-	return dims_[index];
+	if (owns_data_) {
+		if (data_) delete data_;
+	}
 }
 
 void* Tensor::allocate(size_t num_bytes) {
-	CHECK_GT(num_bytes, 0);
+	if (num_bytes <= 0) return nullptr;
 	void* ptr = nullptr;
 #if defined(_WIN32) || defined(WIN32)
 	ptr = _aligned_malloc(num_bytes, ALIGNMENT);

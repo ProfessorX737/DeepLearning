@@ -1,35 +1,90 @@
 #pragma once
-
 #include "BinaryOp.h"
-#include "Tensor.h"
-#include "logging.h"
 
 template<typename T>
 class MatMul : public BinaryOp {
 public:
-	MatMul(Node* left, Node* right) : BinaryOp(left, right, "MatMul") {}
+	MatMul(Node* a, Node* b) 
+		: BinaryOp(a, b, "MatMul"), transA_(0), transB_(0) {}
+
+	MatMul(Node* a, Node* b, bool transA, bool transB)
+		: BinaryOp(a, b, "MatMul"), transA_(transA), transB_(transB) {}
+
 private:
-	Tensor binaryOp(const Tensor& left, const Tensor& right) override {
-		CHECK_EQ(left.numDims(), right.numDims()) 
-			<< "left and right operands have different ndims: " 
-			<< left.dimString() << " vs " << right.dimString();
+	using Matrix = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+	using MatrixMap = Eigen::Map<const Matrix>;
 
-		const int ndims = left.numDims();
+	MatrixMap eigenMatrixSlice(const Tensor& t, int slice) {
+		return MatrixMap(t.asVec<T>().data() + slice * t.dimSize(1) * t.dimSize(2),
+			t.dimSize(1), t.dimSize(2));
+	}
+
+	void binaryOp(Tensor& a, Tensor& b, Tensor* out) override {
+		CHECK_EQ(a.numDims(), b.numDims()) 
+			<< "a and b operands have different ndims: " 
+			<< a.dimString() << " vs " << b.dimString();
+
+		const int ndims = a.numDims();
 		CHECK_GE(ndims,2) 
-			<< "left and right operands need to have >= 2 dims";
+			<< "a and b operands need to have >= 2 dims";
 
-		CHECK_EQ(left.dimSize(left.numDims - 1), right.dimSize(0)) 
-			<< "Inner dims must equal: " << left.dimString() << "*" 
-			<< right.dimString();
-
-		std::vector<Tensor::Index> out_dims;
+		TensorShape out_shape;
 		for (int i = 0; i < ndims - 2; i++) {
-			CHECK_EQ(left.dimSize(i), right.dimSize(i))
-				<< "dimSize(" << i << ") of" << left.dimString() << " and " 
-				<< right.dimString() << " must be the same";
-			out_dims.push_back(left.dimSize(i));
+			CHECK_EQ(a.dimSize(i), b.dimSize(i))
+				<< "dimSize(" << i << ") of" << a.dimString() << " and " 
+				<< b.dimString() << " must be the same";
+			out_shape.addDim(a.dimSize(i));
 		}
 
-		return Tensor({ 1,2 });
+		auto arows = a.dimSize(ndims - 2);
+		auto acols = a.dimSize(ndims - 1);
+		auto brows = b.dimSize(ndims - 2);
+		auto bcols = b.dimSize(ndims - 1);
+
+		if (transA_) std::swap(arows, acols);
+		if (transB_) std::swap(acols, arows);
+
+		CHECK_EQ(acols, brows) 
+			<< "Inner dims must equal: " << a.dimString() << " vs " 
+			<< b.dimString();
+
+		// size of the batch dim is equal to product of all dim sizes except last two
+		TensorShape::Dim nbatch = out_shape.numElements();
+
+		out_shape.addDim(arows);
+		out_shape.addDim(bcols);
+
+		out->init(out_shape, a.dataType());
+
+		// make reshaped a & b that have most 3 dims
+		Tensor rA, rB;
+		rA.sharedCopyInit(a, TensorShape({ nbatch,arows,acols }));
+		rB.sharedCopyInit(b, TensorShape({ nbatch,brows,bcols });
+
+		for (int i = 0; i < nbatch; i++) {
+			auto matA = eigenMatrixSlice(rA, i);
+			auto matB = eigenMatrixSlice(rB, i);
+			auto matOut = eigenMatrixSlice(out, i);
+
+			if (!transA_) {
+				if (!transB_) {
+					matOut.noalias() = matA * matB;
+				}
+				else {
+					matOut.noalias() = matA * matB.transpose();
+				}
+			}
+			else {
+				if (!transB_) {
+					matOut.noalias() = matA.transpose() * matB;
+				}
+				else {
+					matOut.noalias() = matA.transpose() * matB.transpose();
+				}
+			}
+		}
 	}
+
+	bool transA_;
+	bool transB_;
 };

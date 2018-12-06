@@ -3,7 +3,9 @@
 #include <vector>
 #include <unordered_map>
 #include <array>
-#include "Tensor.h"
+#include "types.h"
+
+class Tensor;
 
 static std::unordered_map<std::string, uint32> classIdMap;
 
@@ -19,7 +21,7 @@ public:
 			classIdMap[class_name] = class_id_;
 		}
 	}
-	virtual Tensor eval() = 0;
+	virtual void eval(Tensor& out) = 0;
 	virtual void feed(const Tensor& tensor) {}
 
 	void collect(std::vector<Node*>& conn_nodes, uint32 class_id) {

@@ -1,7 +1,8 @@
 #pragma once
 #include "Node.h"
+#include "logging.h"
+#include "Tensor.h"
 
-class Tensor;
 
 class BinaryOp : public Node {
 public:
@@ -9,9 +10,15 @@ public:
 		children_.push_back(left);
 		children_.push_back(right);
 	}
-	Tensor eval() override {
-		return binaryOp(children_[0]->eval(), children_[1]->eval());
+	void eval(Tensor& out) override {
+		Tensor a,b;
+		children_[0]->eval(a);
+		children_[1]->eval(b);
+		CHECK_EQ(a.dataType(), b.dataType()) 
+			<< "Tensor a & b need to use the same data type: "
+			<< a.dataType() << " vs " << b.dataType();
+		binaryOp(a,b,out);
 	}
 private:
-	virtual Tensor binaryOp(const Tensor& left, const Tensor& right) = 0;
+	virtual void binaryOp(Tensor& left,Tensor& right, Tensor& out) = 0;
 };

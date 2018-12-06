@@ -2,21 +2,25 @@
 #include "types.h"
 #include "logging.h"
 #include "Tensor.h"
+#include "Variable.h"
 
 #include <vector>
 
 using namespace std;
 
 void main(void) {
-	std::vector<Tensor::Index> dims;
-	dims.push_back(4);
-	dims.push_back(1);
-	Tensor t({ 4,1 });
-	t.init({ 1.0f,2.0f,3.0f,4.0f});
-	cout << t.shaped<float, 2>({4,1}) << endl;
-	cout << t.shaped<float, 2>({1,4}) << endl;
+	//Tensor t({ 2,2,2 });
+	//t.init<float>({ 1,2,3,4,
+	//				5,6,7,8 });
+	//float* data = t.data<float>();
+	//for (int i = 0; i < t.numElements(); i++) {
+	//	cout << data[i] << ",";
+	//}
+	Variable v({ 3 },DT_FLOAT);
+	v.fill<float>({ 1,2,3 });
 
-	cout << t.dimString() << endl;
+
+	cout << v.t_.asVec<float>() << endl;
 
 	int in;
 	cin >> in;

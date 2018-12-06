@@ -1,16 +1,18 @@
 #pragma once
 #include "Node.h"
+#include "Tensor.h"
 
-class Tensor;
 
 class UnaryOp : public Node {
 public:
 	UnaryOp(Node* operand, const std::string& class_name) : Node(class_name) {
 		children_.push_back(operand);
 	}
-	Tensor eval() override {
-		return unaryOp(children_[0]->eval());
+	void eval(Tensor& out) override {
+		Tensor in;
+		children_[0]->eval(in);
+		unaryOp(in, out);
 	}
 private:
-	virtual Tensor unaryOp(const Tensor& operand) = 0;
+	virtual void unaryOp(Tensor& operand, Tensor& out) = 0;
 };
