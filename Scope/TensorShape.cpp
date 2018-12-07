@@ -31,3 +31,11 @@ std::string TensorShape::dimString() const {
 	ss << dims_[numDims() - 1] << "]";
 	return ss.str();
 }
+
+bool TensorShape::isSameShape(const TensorShape& other) const {
+	if (numDims() != other.numDims()) return false;
+	for (int i = 0; i < numDims(); i++) {
+		if (dimSize(i) != other.dimSize(i)) return false;
+	}
+	return true;
+}

@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <iostream>
 
-Tensor::Tensor() : Tensor({ 0 }, DT_INVALID) {}
+Tensor::Tensor() : data_(nullptr), dt_(DT_INVALID) {}
 
 Tensor::Tensor(const TensorShape& shape, DataType dt) {
 	init(shape, dt);
@@ -37,6 +37,8 @@ void Tensor::sharedCopyInit(const Tensor& other) {
 	sharedCopyInit(other, other.shape_);
 }
 
+// copy another tensor and shares its data ptr
+// but does not manage its deletion
 void Tensor::sharedCopyInit(const Tensor& other, const TensorShape& shape) {
 	CHECK_EQ(shape.numElements(), other.numElements());
 	dt_ = other.dataType();

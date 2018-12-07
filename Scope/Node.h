@@ -21,15 +21,14 @@ public:
 			classIdMap[class_name] = class_id_;
 		}
 	}
-	virtual void eval(Tensor& out) = 0;
-	virtual void feed(const Tensor& tensor) {}
+	virtual void eval(Tensor& out) const = 0;
 
-	void collect(std::vector<Node*>& conn_nodes, uint32 class_id) {
-		if (class_id_ == class_id) conn_nodes.push_back(this);
-		for (Node* node : children_) node->collect(conn_nodes, class_id);
+	void collect(std::vector<Node*>& conn_nodes, const uint32 class_id) const {
+		if (class_id_ == class_id) conn_nodes.push_back(const_cast<Node*>(this));
+		for (const Node* node : children_) node->collect(conn_nodes, class_id);
 	}
 protected:
-	std::vector<Node*> children_;
+	std::vector<const Node*> children_;
 private:
 	uint32 class_id_;
 };
