@@ -106,3 +106,4 @@ CALL_POD_TYPES(m);					\
 CALL_string(m)
 
 int DataTypeSize(DataType dt);
+
