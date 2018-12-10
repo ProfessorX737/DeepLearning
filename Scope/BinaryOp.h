@@ -3,10 +3,9 @@
 #include "logging.h"
 #include "Tensor.h"
 
-
 class BinaryOp : public Node {
 public:
-	BinaryOp(const Node& left, const Node& right, const std::string& class_name) : Node(class_name) {
+	BinaryOp(const Node& left, const Node& right, const std::string& class_name, Graph& graph) : Node(class_name, graph) {
 		children_.push_back(&left);
 		children_.push_back(&right);
 	}
@@ -18,6 +17,19 @@ public:
 			<< "binary operands need to use the same data type: "
 			<< a.dataType() << " vs " << b.dataType();
 		binaryOp(a,b,out);
+	}
+	void eval(std::unordered_map<int, Tensor>& nodeTensorMap, Tensor& out) const override {
+
+		Tensor in[2];
+		for (int i = 0; i < 2; i++) {
+			auto it = nodeTensorMap.find(children_[i]->getId());
+			if (it == nodeTensorMap.end()) LOG(FATAL) << "Could not find operand tensors in nodeTensorMap";
+			in[i] = it->second;
+		}
+		CHECK_EQ(in[0].dataType(), in[1].dataType()) 
+			<< "binary operands need to use the same data type: "
+			<< in[0].dataType() << " vs " << in[1].dataType();
+		binaryOp(in[0],in[1],out);
 	}
 private:
 	virtual void binaryOp(const Tensor& left, const Tensor& right, Tensor& out) const = 0;

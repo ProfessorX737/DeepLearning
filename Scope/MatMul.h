@@ -4,11 +4,11 @@
 template<typename T>
 class MatMul : public BinaryOp {
 public:
-	MatMul(const Node& a, const Node& b) 
-		: BinaryOp(a, b, "MatMul"), transA_(0), transB_(0) {}
+	MatMul(Graph& graph, const Node& a, const Node& b) 
+		: BinaryOp(a, b, "MatMul", graph), transA_(0), transB_(0) {}
 
-	MatMul(const Node& a, const Node& b, bool transA, bool transB)
-		: BinaryOp(a, b, "MatMul"), transA_(transA), transB_(transB) {}
+	MatMul(Graph& graph, const Node& a, const Node& b, bool transA, bool transB)
+		: BinaryOp(a, b, "MatMul", graph), transA_(transA), transB_(transB) {}
 
 private:
 	using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;

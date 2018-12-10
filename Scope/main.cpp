@@ -11,17 +11,27 @@
 
 using namespace std;
 
+
 void main(void) {
-	auto v1 = Variable({ 2,2,2 },DT_FLOAT);
-	v1.init<float>({ 1,2,3,4,5,6,7,8 });
-	auto v2 = Variable({ 2,2,2 }, DT_FLOAT);
-	v2.init<float>({ 1,1,1,1,1,1,1,1 });
+	Graph graph;
+	auto v1 = Variable(graph,{ 2,2 },DT_FLOAT);
+	v1.init<float>({ 1,2,3,4 });
+	auto v2 = Variable(graph,{ 2,2 }, DT_FLOAT);
+	v2.init<float>({ 1,1,1,1 });
 
-	auto m = Add<float>(v2, v2);
-	Tensor out; 
-	m.eval(out);
+	auto add = Add<float>(graph,v1, v2);
+	auto mult = MatMul<float>(graph, add, v2);
+	auto mult2 = MatMul<float>(graph, add, v1);
 
-	cout << out.tensor<float,3>() << endl;
+	std::unordered_map<int, int> feed_map;
+
+	std::vector<Tensor> out;
+
+
+	//cout << out.matrix<float>() << endl;
+
+	//cout << map[v2.getId()] << endl;
+
 
 	int in;
 	cin >> in;

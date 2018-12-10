@@ -4,7 +4,7 @@
 template<typename T>
 class Add : public BinaryOp {
 public:
-	Add(const Node& a, const Node& b) : BinaryOp(a, b, "Add") {}
+	Add(Graph& graph, const Node& a, const Node& b) : BinaryOp(a, b, "Add", graph) {}
 	~Add() {}
 private:
 	void binaryOp(const Tensor& a, const Tensor& b, Tensor& out) const override {

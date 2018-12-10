@@ -1,8 +1,10 @@
 #pragma once
 
 #include <unsupported/Eigen/CXX11/Tensor>
+#include <memory>
 #include "TensorShape.h"
 #include "types.h"
+#include <iostream>
 
 template<typename T, size_t NDIMS = 1>
 struct TTypes {
@@ -49,8 +51,12 @@ public:
 	TensorShape shape() const { return shape_; }
 
 	template<typename T> 
-	T* data() const { return reinterpret_cast<T*>(data_); }
+	T* data() const { return reinterpret_cast<T*>(buffer_->data); }
 
+	Tensor& operator=(const Tensor& other) {
+		sharedCopyInit(other);
+		return *this;
+	}
 
 	template<size_t NDIMS>
 	Eigen::DSizes<Dim, NDIMS> eigenDims() const;
@@ -71,11 +77,20 @@ public:
 	typename TTypes<T, NDIMS>::Tensor shaped(const dim_init_list& new_dims) const;
 
 private:
-	void* data_;
+	class TensorBuffer {
+	public:
+		TensorBuffer() : data(nullptr) {}
+		~TensorBuffer() {
+			free();
+		}
+		void allocate(size_t num_bytes);
+		void* data;
+	private:
+		void free();
+	};
+	std::shared_ptr<TensorBuffer> buffer_;
 	DataType dt_;
 	TensorShape shape_;
-	bool owns_data_;
-	void* allocate(size_t num_bytes);
 };
 
 template<typename T> 
