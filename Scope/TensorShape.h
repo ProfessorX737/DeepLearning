@@ -21,8 +21,6 @@ public:
 	int numElements() const { return num_elements_; }
 	std::string dimString() const;
 	bool isSameShape(const TensorShape& other) const;
-	bool operator==(const TensorShape& other) const { return isSameShape(other); }
-	bool operator!=(const TensorShape& other) const { return !isSameShape(other); }
 
 private:
 	std::vector<Dim> dims_;

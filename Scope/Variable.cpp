@@ -9,6 +9,6 @@ Variable::Variable(Graph& graph, const TensorShape& shape, DataType dt) : Node("
 
 Tensor Variable::tensor() {
 	Tensor t;
-	t.sharedCopyInit(t_);
-	return t;
+	t = t_;
+	return std::move(t);
 }

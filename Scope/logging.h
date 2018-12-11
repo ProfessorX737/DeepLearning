@@ -57,6 +57,7 @@ public:
 
 #ifndef NDEBUG
 
+#define DCHECK(expr) CHECK(expr)
 #define DCHECK_EQ(val1,val2) CHECK_OP(val1,==,val2)
 #define DCHECK_NE(val1,val2) CHECK_OP(val1,!=,val2)
 #define DCHECK_LE(val1,val2) CHECK_OP(val1,<=,val2)
@@ -71,6 +72,7 @@ public:
 
 #define DUD_STREAM if(false) LOG(FATAL)
 
+#define DCHECK(expr) DUD_STREAM
 #define DCHECK_EQ(val1,val2) DUD_STREAM
 #define DCHECK_NE(val1,val2) DUD_STREAM 
 #define DCHECK_LE(val1,val2) DUD_STREAM 

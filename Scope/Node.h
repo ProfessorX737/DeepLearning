@@ -6,6 +6,7 @@
 #include "types.h"
 #include "Graph.h"
 #include <memory>
+#include <set>
 
 class Tensor;
 
@@ -14,25 +15,14 @@ static std::unordered_map<std::string, uint32> classIdMap;
 class Node {
 	
 public:
+	typedef std::set<Node*, std::function<bool(Node*, Node*)>> Set;
 	Node(const std::string& class_name, Graph& graph);
 
 	virtual void eval(Tensor& out) const = 0;
+	void evaluate(const std::unordered_map<int, Tensor>& feed, Tensor& out) const;
 	virtual void eval(std::unordered_map<int, Tensor>& nodeTensorMap, Tensor& out) const { eval(out); }
 
-	void collect(std::vector<Node*>& conn_nodes) const;
-	void collect(std::vector<Node*>& conn_nodes, int class_id) const;
-	void collect(std::unordered_map<int, int>& nodeLevelMap, int level) const {
-		auto it = nodeLevelMap.find(id_);
-		if (it == nodeLevelMap.end()) {
-			nodeLevelMap.insert({ id_,level });
-		}
-		else {
-			if (level > it->second) nodeLevelMap[id_] = level;
-		}
-		for (const Node* n : children_) {
-			n->collect(nodeLevelMap, level+1);
-		}
-	}
+	int collect(Set& conn_nodes, std::unordered_map<int,int>& depthMap, int level = 0) const;
 
 	int depth(int level = 0) const {
 		int maxDepth = level;
@@ -45,6 +35,7 @@ public:
 
 	int getClassId() const { return class_id_; }
 	int getId() const { return id_; }
+	int numChildren() const { return children_.size(); }
 
 protected:
 	friend class Graph;

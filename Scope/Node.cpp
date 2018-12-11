@@ -1,4 +1,6 @@
 #include "Node.h"
+#include "Tensor.h"
+#include <iostream>
 
 Node::Node(const std::string& class_name, Graph& graph) {
 	// set class_id
@@ -12,15 +14,20 @@ Node::Node(const std::string& class_name, Graph& graph) {
 	}
 	// set scope_id
 	id_ = graph.getUniqueId();
-	graph.addNode(*this);
 }
 
-void Node::collect(std::vector<Node*>& conn_nodes) const {
-	conn_nodes.push_back(const_cast<Node*>(this));
-	for (const Node* node : children_) node->collect(conn_nodes);
+void Node::evaluate(const std::unordered_map<int, Tensor>& feed, Tensor& out) const {
+	std::unordered_map<int, Tensor> nodeTensorMap = std::move(feed);
+	eval(nodeTensorMap, out);
 }
 
-void Node::collect(std::vector<Node*>& conn_nodes, int class_id) const {
-	if (class_id_ == class_id) conn_nodes.push_back(const_cast<Node*>(this));
-	for (const Node* node : children_) node->collect(conn_nodes, class_id);
+int Node::collect(Set& conn_nodes, std::unordered_map<int,int>& depthMap, int level) const {
+	int maxDepth = level;
+	conn_nodes.insert(const_cast<Node*>(this));
+	for (const Node* node : children_) {
+		int depth = node->collect(conn_nodes, depthMap, level + 1);
+		if (depth > maxDepth) maxDepth = depth;
+	}
+	depthMap[id_] = maxDepth - level;
+	return maxDepth;
 }

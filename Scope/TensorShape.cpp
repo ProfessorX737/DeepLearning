@@ -13,13 +13,13 @@ void TensorShape::init(const dim_init_list& dims) {
 }
 
 void TensorShape::addDim(Dim d) {
-	DCHECK_GE(d, 0);
+	DCHECK_GE(d, -1);
 	num_elements_ *= d;
 	dims_.push_back(d);
 }
 
 int TensorShape::dimSize(int i) const {
-	DCHECK_GE(i, 0);
+	DCHECK_GE(i, -1);
 	DCHECK_LT(i, numDims());
 	return dims_[i];
 }
