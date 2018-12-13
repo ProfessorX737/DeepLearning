@@ -4,7 +4,7 @@
 
 class BinaryOp : public Op<2> {
 public:
-	BinaryOp(Graph& graph, const Node& left, const Node& right, const std::string& class_name) : Op(graph, { {&left, &right} }, class_name) {
+	BinaryOp(Graph& graph, NodePtr& left, NodePtr& right, const std::string& class_name) : Op(graph, { {left, right} }, class_name) {
 	}
 private:
 	virtual void binaryOp(const Tensor& left, const Tensor& right, Tensor& out) const = 0;
@@ -24,7 +24,7 @@ private:
 //
 //class BinaryOp : public Node {
 //public:
-//	BinaryOp(const Node& left, const Node& right, const std::string& class_name, Graph& graph) : Node(class_name, graph) {
+//	BinaryOp(NodePtr& left, NodePtr& right, const std::string& class_name, Graph& graph) : Node(class_name, graph) {
 //		children_.push_back(&left);
 //		children_.push_back(&right);
 //	}

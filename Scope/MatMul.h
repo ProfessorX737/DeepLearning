@@ -2,12 +2,12 @@
 #include "BinaryOp.h"
 
 template<typename T>
-class MatMul : public BinaryOp {
+class MatMulOp : public BinaryOp {
 public:
-	MatMul(Graph& graph, const Node& a, const Node& b) 
+	MatMulOp(Graph& graph, NodePtr& a, NodePtr& b) 
 		: BinaryOp(graph, a, b, "MatMul"), transA_(0), transB_(0) {}
 
-	MatMul(Graph& graph, const Node& a, const Node& b, bool transA, bool transB)
+	MatMulOp(Graph& graph, NodePtr& a, NodePtr& b, bool transA, bool transB)
 		: BinaryOp(graph, a, b, "MatMul"), transA_(transA), transB_(transB) {}
 
 private:
@@ -96,3 +96,16 @@ private:
 	bool transA_;
 	bool transB_;
 };
+
+inline NodePtr MatMul(Graph& graph, NodePtr a, NodePtr b) {
+	NodePtr ret;
+	NUMBER_TYPE_CASES(a->dataType(), ret = std::make_shared<MatMulOp<T> >(graph, a, b));
+	return ret;
+}
+
+inline NodePtr MatMul(Graph& graph, NodePtr a, NodePtr b, bool transA, bool transB) {
+	NodePtr ret;
+	NUMBER_TYPE_CASES(a->dataType(), ret = std::make_shared<MatMulOp<T> >(graph, a, b,
+		transA, transB));
+	return ret;
+}

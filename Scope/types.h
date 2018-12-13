@@ -69,40 +69,54 @@ TYPE_AND_ENUM(bool, DT_BOOL);
 
 #undef TYPE_AND_ENUM
 
-#define CALL_float(m) m(float)
-#define CALL_double(m) m(double)
-#define CALL_int64(m) m(int64)
-#define CALL_int32(m) m(int32)
-#define CALL_int16(m) m(int16)
-#define CALL_int8(m) m(int8)
-#define CALL_uint64(m) m(uint64)
-#define CALL_uint32(m) m(uint32)
-#define CALL_uint16(m) m(uint16)
-#define CALL_uint8(m) m(uint8)
-#define CALL_string(m) m(std::string)
-#define CALL_bool(m) m(bool)
+#define CALL_float(m, ...) m(float, __VA_ARGS__)
+#define CALL_double(m, ...) m(double, __VA_ARGS__)
+#define CALL_int64(m, ...) m(int64, __VA_ARGS__)
+#define CALL_int32(m, ...) m(int32, __VA_ARGS__)
+#define CALL_int16(m, ...) m(int16, __VA_ARGS__)
+#define CALL_int8(m, ...) m(int8, __VA_ARGS__)
+#define CALL_uint64(m, ...) m(uint64, __VA_ARGS__)
+#define CALL_uint32(m, ...) m(uint32, __VA_ARGS__)
+#define CALL_uint16(m, ...) m(uint16, __VA_ARGS__)
+#define CALL_uint8(m, ...) m(uint8, __VA_ARGS__)
+#define CALL_string(m, ...) m(std::string, __VA_ARGS__)
+#define CALL_bool(m, ...) m(bool, __VA_ARGS__)
 
-#define CALL_INTEGRALS(m)			\
-CALL_int64(m)						\
-CALL_int32(m)						\
-CALL_int16(m)						\
-CALL_int8(m)						\
-CALL_uint64(m)						\
-CALL_uint32(m)						\
-CALL_uint16(m)						\
-CALL_uint8(m)
+#define CALL_INTEGRALS(m, ...)					\
+CALL_int64(m, __VA_ARGS__)						\
+CALL_int32(m, __VA_ARGS__)						\
+CALL_int16(m, __VA_ARGS__)						\
+CALL_int8(m, __VA_ARGS__)						\
+CALL_uint64(m, __VA_ARGS__)						\
+CALL_uint32(m, __VA_ARGS__)						\
+CALL_uint16(m, __VA_ARGS__)						\
+CALL_uint8(m, __VA_ARGS__)
 
-#define CALL_NUMBER_TYPES(m)		\
-CALL_INTEGRALS(m)					\
-CALL_float(m)						\
-CALL_double(m)
+#define CALL_NUMBER_TYPES(m, ...)				\
+CALL_INTEGRALS(m, __VA_ARGS__)					\
+CALL_float(m, __VA_ARGS__)						\
+CALL_double(m, __VA_ARGS__)
 
-#define CALL_POD_TYPES(m)			\
-CALL_NUMBER_TYPES(m)				\
-CALL_bool(m)
+#define CALL_POD_TYPES(m, ...)					\
+CALL_NUMBER_TYPES(m, __VA_ARGS__)				\
+CALL_bool(m, __VA_ARGS__)
 
-#define CALL_ALL_TYPES(m)			\
-CALL_POD_TYPES(m);					\
-CALL_string(m)
+#define CALL_ALL_TYPES(m, ...)					\
+CALL_POD_TYPES(m, __VA_ARGS__);					\
+CALL_string(m, __VA_ARGS__)
 
 int DataTypeSize(DataType dt);
+
+#define SWITCH_CASE(TYPE,STMT)						\
+	case DataTypeToEnum<TYPE>::value: {				\
+		typedef TYPE T;								\
+		STMT;										\
+		break;										\
+}
+
+#define NUMBER_TYPE_CASES(ENUM, STMT)				\
+	switch (ENUM) {									\
+		CALL_NUMBER_TYPES(SWITCH_CASE,STMT)			\
+	default:										\
+		LOG(FATAL) << "Invalid type: " << #ENUM;	\
+	}					

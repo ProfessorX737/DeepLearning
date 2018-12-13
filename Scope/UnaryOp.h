@@ -3,7 +3,7 @@
 
 class UnaryOp : public Op<1> {
 public:
-	UnaryOp(Graph& graph, const Node& operand, const std::string& class_name) : Op(graph, { {&operand} }, class_name) {
+	UnaryOp(Graph& graph, NodePtr& operand, const std::string& class_name) : Op(graph, { {operand} }, class_name) {
 	}
 private:
 	virtual void unaryOp(const Tensor& operand, Tensor& out) const = 0;
@@ -19,7 +19,7 @@ private:
 //
 //class UnaryOp : public Node {
 //public:
-//	UnaryOp(Graph& graph, const Node& operand, const std::string& class_name) : Node(class_name, graph) {
+//	UnaryOp(Graph& graph, NodePtr& operand, const std::string& class_name) : Node(class_name, graph) {
 //		children_.push_back(&operand);
 //	}
 //	void eval(Tensor& out) const override {

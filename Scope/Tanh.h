@@ -1,13 +1,10 @@
 #pragma once
 #include "UnaryOp.h"
-#include <Eigen/Dense>
-
-class Tensor;
 
 template<typename T>
-class Tanh : public UnaryOp {
+class TanhOp : public UnaryOp {
 public:
-	Tanh(Graph& graph, const Node& in) : UnaryOp(graph, in, "Tanh") {}
+	TanhOp(Graph& graph, NodePtr& in) : UnaryOp(graph, in, "Tanh") {}
 	void unaryOp(const Tensor& in, Tensor& out) const override {
 		TensorShape outShape = in.shape();
 		out.init(outShape, in.dataType());
@@ -15,3 +12,9 @@ public:
 		outVec = in.asVec<T>().array().tanh().matrix();
 	}
 };
+
+inline NodePtr Tanh(Graph& graph, NodePtr in) {
+	NodePtr ret;
+	NUMBER_TYPE_CASES(in->dataType(), ret = std::make_shared<TanhOp<T>>(graph, in));
+	return ret;
+}

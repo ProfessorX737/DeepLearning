@@ -10,12 +10,13 @@
 #include "Tanh.h"
 #include "Square.h"
 #include "Sub.h"
+#include "Graph.h"
 
 #include <vector>
 
 using namespace std;
 
-void main(void) {
+int main(void) {
 	const int I = 2;
 	const int H = 2;
 	const int O = 1;
@@ -34,27 +35,25 @@ void main(void) {
 
 	auto w1 = Variable(graph, { I,H }, DT_FLOAT);
 	auto b1 = Variable(graph, { BATCH_SIZE,H }, DT_FLOAT);
-	auto mult1 = MatMul<float>(graph, x, w1);
-	auto h1 = Add<float>(graph, mult1, b1);
+	auto h1 = Tanh(graph,Add(graph, MatMul(graph,x,w1), b1));
 	auto w2 = Variable(graph, { H,O }, DT_FLOAT);
 	auto b2 = Variable(graph, { BATCH_SIZE,O }, DT_FLOAT);
-	auto mult2 = MatMul<float>(graph, h1, w2);
-	auto h2 = Add<float>(graph, mult2, b2);
-	auto diff = Sub<float>(graph, h2, y);
-	auto sqrDiff = Square<float>(graph, diff);
+	auto h2 = Add(graph, MatMul(graph,h1,w2), b2);
+	auto diff = Sub(graph, h2, y);
+	auto sqrDiff = Square(graph, diff);
 
 	//w1.init(RandomNormal<float>(0, 0.1));
 	//w2.init(RandomNormal<float>(0, 0.1));
-	w1.init<float>({ 2,2,2,2 });
-	w2.init<float>({ 2,2 });
-	b1.init(ZeroInit<float>());
-	b2.init(ZeroInit<float>());
-
+	w1->init<float>({ 2,2,2,2 });
+	w2->init<float>({ 2,2 });
+	b1->init(ZeroInit<float>());
+	b2->init(ZeroInit<float>());
 
 	std::vector<Tensor> out;
-	graph.eval({ {x.getId(),data},{y.getId(),label} }, { &sqrDiff }, out);
+	graph.eval({ {x,data},{y,label} }, { sqrDiff }, out);
 
 	cout << out[0].matrix<float>() << endl;
 
 	cin.get();
+	return 0;
 }

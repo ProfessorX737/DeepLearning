@@ -6,7 +6,7 @@
 template<int NINPUT>
 class Op : public Node {
 public:
-	Op(Graph& graph, const std::array<const Node*,NINPUT>& operands, const std::string& class_name) : Node(graph, class_name) {
+	Op(Graph& graph, const std::array<NodePtr,NINPUT>& operands, const std::string& class_name) : Node(graph, class_name) {
 		for (int i = 0; i < NINPUT; i++) {
 			children_.push_back(std::move(operands[i]));
 		}
@@ -18,7 +18,7 @@ public:
 		}
 		op(in,out);
 	}
-	void eval(std::unordered_map<int, Tensor>& nodeTensorMap, Tensor& out) const override {
+	void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const override {
 
 		std::array<Tensor, NINPUT> in;
 		for (int i = 0; i < NINPUT; i++) {
@@ -37,6 +37,9 @@ public:
 			}
 		}
 		op(in,out);
+	}
+	DataType dataType() const override {
+		return (NINPUT == 0) ? DT_INVALID : children_[0]->dataType();
 	}
 private:
 	virtual void op(const std::array<Tensor,NINPUT>& in, Tensor& out) const = 0;

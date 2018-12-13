@@ -3,23 +3,20 @@
 #include "logging.h"
 #include "TensorShape.h"
 
-class Placeholder : public Node {
+class PlaceholderOp;
+
+typedef std::shared_ptr<PlaceholderOp> PlaceholderPtr;
+PlaceholderPtr Placeholder(Graph& graph, const TensorShape& shape, DataType dt = DT_FLOAT);
+	
+
+class PlaceholderOp : public Node, public std::enable_shared_from_this<PlaceholderOp> {
 public:
-	//Placeholder(Graph& graph) : Node(graph, "Placeholder") {}
-	Placeholder(Graph& graph, const TensorShape& shape) : Node(graph, "Placeholder") {
-		shape_ = std::move(shape);
-	}
-	void eval(Tensor& out) const override {
-		LOG(FATAL) << "Placeholder with node id: " << getId() << ", needs to be fed a value";
-	}
-	void eval(std::unordered_map<int, Tensor>& nodeTensorMap, Tensor& out) const override {
-		auto it = nodeTensorMap.find(getId());
-		if (it == nodeTensorMap.end()) LOG(FATAL) << "Missing placeholder input";
-		DCHECK(shape_.isSameShape(it->second.shape())) << "Input to placeholder is not have a compatible shape "
-			<< shape_.dimString() << " vs " << it->second.shape().dimString();
-		out = it->second;
-	}
+	PlaceholderOp(Graph& graph, const TensorShape& shape, DataType dt = DT_FLOAT);
+	void eval(Tensor& out) const override;
+	void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const override;
+	DataType dataType() const override { return dt_; }
 	TensorShape shape() { return shape_; }
 private:
 	TensorShape shape_;
+	DataType dt_;
 };

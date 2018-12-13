@@ -3,9 +3,9 @@
 #include "UnaryOp.h"
 
 template<typename T>
-class Square : public UnaryOp {
+class SquareOp : public UnaryOp {
 public:
-	Square(Graph& graph, const Node& in) : UnaryOp(graph, in, "Square") {}
+	SquareOp(Graph& graph, NodePtr& in) : UnaryOp(graph, in, "Square") {}
 	void unaryOp(const Tensor& in, Tensor& out) const override {
 		TensorShape outShape = in.shape();
 		out.init(outShape, in.dataType());
@@ -13,3 +13,9 @@ public:
 		outVec = in.asVec<T>().array().square().matrix();
 	}
 };
+
+inline NodePtr Square(Graph& graph, NodePtr in) {
+	NodePtr ret;
+	NUMBER_TYPE_CASES(in->dataType(), ret = std::make_shared<SquareOp<T>>(graph, in));
+	return ret;
+}

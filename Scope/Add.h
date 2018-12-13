@@ -2,10 +2,10 @@
 #include "BinaryOp.h"
 
 template<typename T>
-class Add : public BinaryOp {
+class AddOp : public BinaryOp {
 public:
-	Add(Graph& graph, const Node& a, const Node& b) : BinaryOp(graph, a, b, "Add") {}
-	~Add() {}
+	AddOp(Graph& graph, NodePtr& a, NodePtr& b) : BinaryOp(graph, a, b, "Add") {}
+	~AddOp() {}
 private:
 	void binaryOp(const Tensor& a, const Tensor& b, Tensor& out) const override {
 		CHECK_GE(a.numDims(), 1);
@@ -21,3 +21,9 @@ private:
 		vecOut = vecA + vecB;
 	}
 };
+
+inline NodePtr Add(Graph& graph, NodePtr a, NodePtr b) {
+	NodePtr ret;
+	NUMBER_TYPE_CASES(a->dataType(), ret = std::make_shared<AddOp<T>>(graph, a, b));
+	return ret;
+}
