@@ -1,12 +1,11 @@
 #pragma once
+
 #include "BinaryOp.h"
 
 template<typename T>
-class Add : public BinaryOp {
+class Sub : public BinaryOp {
 public:
-	Add(Graph& graph, const Node& a, const Node& b) : BinaryOp(graph, a, b, "Add") {}
-	~Add() {}
-private:
+	Sub(Graph& graph, const Node& a, const Node& b) : BinaryOp(graph, a, b, "Sub") {}
 	void binaryOp(const Tensor& a, const Tensor& b, Tensor& out) const override {
 		CHECK_GE(a.numDims(), 1);
 		CHECK_GE(b.numDims(), 1);
@@ -18,6 +17,6 @@ private:
 		auto vecA = a.asVec<T>();
 		auto vecB = b.asVec<T>();
 		auto vecOut = out.asVec<T>();
-		vecOut = vecA + vecB;
+		vecOut = vecA - vecB;
 	}
 };

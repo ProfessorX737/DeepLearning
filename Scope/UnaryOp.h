@@ -3,7 +3,8 @@
 
 class UnaryOp : public Op<1> {
 public:
-	UnaryOp(const Node& operand, const std::string& class_name, Graph& graph) : Op({ {&operand} }, class_name, graph) {}
+	UnaryOp(Graph& graph, const Node& operand, const std::string& class_name) : Op(graph, { {&operand} }, class_name) {
+	}
 private:
 	virtual void unaryOp(const Tensor& operand, Tensor& out) const = 0;
 	void op(const std::array<Tensor,1>& in, Tensor& out) const override {

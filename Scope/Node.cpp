@@ -2,7 +2,7 @@
 #include "Tensor.h"
 #include <iostream>
 
-Node::Node(const std::string& class_name, Graph& graph) {
+Node::Node(Graph& graph, const std::string& class_name) {
 	// set class_id
 	auto it = classIdMap.find(class_name);
 	if (it != classIdMap.end()) {
@@ -12,6 +12,7 @@ Node::Node(const std::string& class_name, Graph& graph) {
 		class_id_ = classIdMap.size();
 		classIdMap[class_name] = class_id_;
 	}
+	class_name_ = class_name;
 	// set scope_id
 	id_ = graph.getUniqueId();
 }

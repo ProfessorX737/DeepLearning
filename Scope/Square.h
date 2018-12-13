@@ -1,17 +1,15 @@
 #pragma once
-#include "UnaryOp.h"
-#include <Eigen/Dense>
 
-class Tensor;
+#include "UnaryOp.h"
 
 template<typename T>
-class Tanh : public UnaryOp {
+class Square : public UnaryOp {
 public:
-	Tanh(Graph& graph, const Node& in) : UnaryOp(graph, in, "Tanh") {}
+	Square(Graph& graph, const Node& in) : UnaryOp(graph, in, "Square") {}
 	void unaryOp(const Tensor& in, Tensor& out) const override {
 		TensorShape outShape = in.shape();
 		out.init(outShape, in.dataType());
 		auto outVec = out.asVec<T>();
-		outVec = in.asVec<T>().array().tanh().matrix();
+		outVec = in.asVec<T>().array().square().matrix();
 	}
 };

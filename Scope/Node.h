@@ -16,7 +16,7 @@ class Node {
 	
 public:
 	typedef std::set<Node*, std::function<bool(Node*, Node*)>> Set;
-	Node(const std::string& class_name, Graph& graph);
+	Node(Graph& graph, const std::string& class_name);
 
 	virtual void eval(Tensor& out) const = 0;
 	void evaluate(const std::unordered_map<int, Tensor>& feed, Tensor& out) const;
@@ -39,6 +39,7 @@ public:
 
 protected:
 	friend class Graph;
+	std::string class_name_;
 	std::vector<const Node*> children_;
 private:
 	// class id is unique for different class types

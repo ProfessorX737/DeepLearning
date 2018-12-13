@@ -5,8 +5,8 @@
 
 class Placeholder : public Node {
 public:
-	Placeholder(Graph& graph) : Node("Placeholder",graph) {}
-	Placeholder(Graph& graph, const TensorShape& shape) : Node("Placeholder",graph) {
+	//Placeholder(Graph& graph) : Node(graph, "Placeholder") {}
+	Placeholder(Graph& graph, const TensorShape& shape) : Node(graph, "Placeholder") {
 		shape_ = std::move(shape);
 	}
 	void eval(Tensor& out) const override {

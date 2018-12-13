@@ -1,9 +1,11 @@
 #pragma once
 #include "Op.h"
+#include <string>
 
 class BinaryOp : public Op<2> {
 public:
-	BinaryOp(const Node& left, const Node& right, const std::string& class_name, Graph& graph) : Op({ {&left, &right} }, class_name, graph) {}
+	BinaryOp(Graph& graph, const Node& left, const Node& right, const std::string& class_name) : Op(graph, { {&left, &right} }, class_name) {
+	}
 private:
 	virtual void binaryOp(const Tensor& left, const Tensor& right, Tensor& out) const = 0;
 	void op(const std::array<Tensor, 2>& in, Tensor& out) const override {
