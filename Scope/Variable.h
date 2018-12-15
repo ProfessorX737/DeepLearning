@@ -23,7 +23,8 @@ public:
 	}
 	bool deriv(Tensor& out) const {
 		out = Tensor(t_.shape(), t_.dataType());
-		memset(out.data<T>(),)
+		std::fill_n(out.data<T>(), out.numElements(), 1);
+		return true;
 	}
 private:
 	Tensor t_;

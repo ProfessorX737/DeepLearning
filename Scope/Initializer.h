@@ -39,6 +39,6 @@ class Ones : public Initializer<T> {
 	Ones() {}
 	~Ones() {}
 	void init(T* data, int num_elements) const override {
-		memset(data, 1, num_elements * sizeof(T));
+		std::fill_n(data, num_elements, 1);
 	}
 };

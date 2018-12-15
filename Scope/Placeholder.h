@@ -16,6 +16,7 @@ public:
 	void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const override;
 	DataType dataType() const override { return dt_; }
 	TensorShape shape() { return shape_; }
+	bool deriv(Tensor& out) const override { }
 private:
 	TensorShape shape_;
 	DataType dt_;

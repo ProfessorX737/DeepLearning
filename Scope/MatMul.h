@@ -93,6 +93,15 @@ private:
 		}
 	}
 
+	bool deriv(Tensor& out) const override {
+		Tensor t1, t2;
+		bool lhs = children_[0]->deriv(t1);
+		bool rhs = children_[1]->deriv(t2);
+		binaryOp(t1, t2, out);
+		if (lhs || rhs) return true;
+		return false;
+	}
+
 	bool transA_;
 	bool transB_;
 };
