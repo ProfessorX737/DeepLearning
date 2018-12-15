@@ -33,11 +33,11 @@ int main(void) {
 	auto x = Placeholder(graph, { BATCH_SIZE,I });
 	auto y = Placeholder(graph, { BATCH_SIZE,O });
 
-	auto w1 = Variable(graph, { I,H }, DT_FLOAT);
-	auto b1 = Variable(graph, { BATCH_SIZE,H }, DT_FLOAT);
+	auto w1 = Variable<float>(graph, { I,H });
+	auto b1 = Variable<float>(graph, { BATCH_SIZE,H });
 	auto h1 = Tanh(graph, Add(graph, MatMul(graph,x,w1), b1));
-	auto w2 = Variable(graph, { H,O }, DT_FLOAT);
-	auto b2 = Variable(graph, { BATCH_SIZE,O }, DT_FLOAT);
+	auto w2 = Variable<float>(graph, { H,O });
+	auto b2 = Variable<float>(graph, { BATCH_SIZE,O });
 	auto h2 = Add(graph, MatMul(graph,h1,w2), b2);
 	auto sqrDiff = Square(graph, Sub(graph, h2, y));
 
