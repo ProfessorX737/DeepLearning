@@ -20,3 +20,7 @@ Tensor VariableOp::tensor() {
 	t = t_;
 	return std::move(t);
 }
+
+//bool VariableOp::deriv(Tensor& out) const {
+//	out = Tensor(t_.shape(), t_.dataType());
+//}

@@ -4,7 +4,6 @@
 #include <memory>
 #include "TensorShape.h"
 #include "types.h"
-#include <iostream>
 
 template<typename T, size_t NDIMS = 1>
 struct TTypes {
@@ -49,6 +48,7 @@ public:
 	DataType dataType() const { return dt_; }
 	std::string dimString() const { return shape_.dimString(); }
 	TensorShape shape() const { return shape_; }
+	int dataTypeSize() { return dt_size_; }
 
 	template<typename T> 
 	T* data() const { return reinterpret_cast<T*>(buffer_->data); }
@@ -90,6 +90,7 @@ private:
 	};
 	std::shared_ptr<TensorBuffer> buffer_;
 	DataType dt_;
+	int dt_size_;
 	TensorShape shape_;
 };
 

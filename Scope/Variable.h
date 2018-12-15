@@ -20,6 +20,7 @@ public:
 	template<typename T>
 	void init(const std::initializer_list<T>& list) { t_.fill<T>(list); }
 	void eval(Tensor& out) const { out = t_; };
+	//bool deriv(Tensor& out) const;
 	DataType dataType() const override { return t_.dataType(); }
 	Tensor tensor();
 private:

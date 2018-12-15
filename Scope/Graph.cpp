@@ -1,7 +1,6 @@
 #include "Graph.h"
 #include "Tensor.h"
-#include <iostream>
-#include <set>
+#include "Node.h"
 
 size_t hashFn(NodePtr n) {
 	std::hash<int> intHasher;

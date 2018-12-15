@@ -93,9 +93,9 @@ CALL_uint16(m, __VA_ARGS__)						\
 CALL_uint8(m, __VA_ARGS__)
 
 #define CALL_NUMBER_TYPES(m, ...)				\
-CALL_INTEGRALS(m, __VA_ARGS__)					\
 CALL_float(m, __VA_ARGS__)						\
-CALL_double(m, __VA_ARGS__)
+CALL_double(m, __VA_ARGS__)						\
+CALL_INTEGRALS(m, __VA_ARGS__)	
 
 #define CALL_POD_TYPES(m, ...)					\
 CALL_NUMBER_TYPES(m, __VA_ARGS__)				\
@@ -114,9 +114,11 @@ int DataTypeSize(DataType dt);
 		break;										\
 }
 
-#define NUMBER_TYPE_CASES(ENUM, STMT)				\
+#define TYPE_CASES(ENUM, STMT, CALL)				\
 	switch (ENUM) {									\
-		CALL_NUMBER_TYPES(SWITCH_CASE,STMT)			\
+		CALL(SWITCH_CASE,STMT)						\
 	default:										\
 		LOG(FATAL) << "Invalid type: " << #ENUM;	\
 	}					
+
+#define NUMBER_TYPE_CASES(ENUM,STMT) TYPE_CASES(ENUM,STMT,CALL_NUMBER_TYPES)

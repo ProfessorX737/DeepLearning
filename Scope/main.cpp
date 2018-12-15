@@ -35,24 +35,24 @@ int main(void) {
 
 	auto w1 = Variable(graph, { I,H }, DT_FLOAT);
 	auto b1 = Variable(graph, { BATCH_SIZE,H }, DT_FLOAT);
-	auto h1 = Tanh(graph,Add(graph, MatMul(graph,x,w1), b1));
+	auto h1 = Tanh(graph, Add(graph, MatMul(graph,x,w1), b1));
 	auto w2 = Variable(graph, { H,O }, DT_FLOAT);
 	auto b2 = Variable(graph, { BATCH_SIZE,O }, DT_FLOAT);
 	auto h2 = Add(graph, MatMul(graph,h1,w2), b2);
-	auto diff = Sub(graph, h2, y);
-	auto sqrDiff = Square(graph, diff);
+	auto sqrDiff = Square(graph, Sub(graph, h2, y));
 
-	//w1.init(RandomNormal<float>(0, 0.1));
-	//w2.init(RandomNormal<float>(0, 0.1));
-	w1->init<float>({ 2,2,2,2 });
-	w2->init<float>({ 2,2 });
+	w1->init(RandomNormal<float>(0, 0.1));
+	w2->init(RandomNormal<float>(0, 0.1));
+	//w1->init<float>({ 2,2,2,2 });
+	//w2->init<float>({ 2,2 });
 	b1->init(ZeroInit<float>());
 	b2->init(ZeroInit<float>());
 
 	std::vector<Tensor> out;
-	graph.eval({ {x,data},{y,label} }, { sqrDiff }, out);
+	graph.eval({ {x,data},{y,label} }, { h2,sqrDiff }, out);
 
 	cout << out[0].matrix<float>() << endl;
+	cout << out[1].matrix<float>() << endl;
 
 	cin.get();
 	return 0;

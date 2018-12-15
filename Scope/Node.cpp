@@ -1,7 +1,6 @@
 #include "Node.h"
 #include "Tensor.h"
 #include "Graph.h"
-#include <iostream>
 
 Node::Node(Graph& graph, const std::string& class_name) {
 	// set class_id

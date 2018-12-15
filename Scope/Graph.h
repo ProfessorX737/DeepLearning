@@ -5,12 +5,13 @@
 #include "logging.h"
 #include <set>
 #include <memory>
-#include "Node.h"
 
 class Tensor;
+class Node;
 
 class Graph {
 public:
+	typedef std::shared_ptr<Node> NodePtr;
 	//typedef std::set<Node*, std::function<bool(Node*, Node*)>> Set;
 	Graph();
 	~Graph();

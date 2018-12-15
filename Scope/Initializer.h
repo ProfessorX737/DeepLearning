@@ -33,3 +33,12 @@ public:
 		memset(data, 0, num_elements * sizeof(T));
 	}
 };
+
+template<typename T>
+class Ones : public Initializer<T> {
+	Ones() {}
+	~Ones() {}
+	void init(T* data, int num_elements) const override {
+		memset(data, 1, num_elements * sizeof(T));
+	}
+};

@@ -20,14 +20,16 @@ void Tensor::init(const TensorShape& shape, DataType dt) {
 	shape_ = std::move(shape);
 	dt_ = dt;
 	buffer_ = std::make_shared<TensorBuffer>();
-	buffer_->allocate(numElements()*DataTypeSize(dt_));
+	dt_size_ = DataTypeSize(dt_);
+	buffer_->allocate(numElements()*dt_size_);
 }
 
 void Tensor::init(const dim_init_list& dims, DataType dt) {
 	shape_.init(dims);
 	dt_ = dt;
 	buffer_ = std::make_shared<TensorBuffer>();
-	buffer_->allocate(numElements()*DataTypeSize(dt_));
+	dt_size_ = DataTypeSize(dt_);
+	buffer_->allocate(numElements()*dt_size_);
 }
 
 void Tensor::sharedCopyInit(const Tensor& other) {
