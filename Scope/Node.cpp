@@ -17,6 +17,14 @@ Node::Node(Graph& graph, const std::string& class_name) {
 	id_ = graph.getUniqueId();
 }
 
+void Node::collectPaths(std::vector<std::vector<int>>& paths) {
+	std::vector<std::vector<std::vector<int>>> temp;
+	for (int i = 0; i < children_.size(); i++) {
+		temp.emplace_back();
+		children_[i]->collectPaths(temp[i]);
+	}
+}
+
 //void Node::evaluate(const std::unordered_map<int, Tensor>& feed, Tensor& out) const {
 //	std::unordered_map<int, Tensor> nodeTensorMap = std::move(feed);
 //	eval(nodeTensorMap, out);
