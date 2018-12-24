@@ -21,10 +21,10 @@ public:
 	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx) const {
 		DCHECK((wrtIdx == 0) || (wrtIdx == 1));
 		if (wrtIdx == 0) {
-			dx.multiply(in[0]);
+			dx.multiply<T>(in[0]);
 		}
 		else {
-			dx.multiply(-1 * in[1]);
+			dx.multiply<T>(in[1] * -1);
 		}
 	}
 	

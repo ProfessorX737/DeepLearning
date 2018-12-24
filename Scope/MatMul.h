@@ -98,11 +98,7 @@ public:
 
 	// allows broadcasting for scalars
 	static void mult(const Tensor& a, const Tensor& b, Tensor& out, bool transA = false, bool transB = false) {
-		if (a.numElements() == 1 && b.numElements() == 1) {
-			out.init<T>({ a.data<T>()[0] * b.data<T>()[0] });
-			return;
-		}
-		else if (a.numElements() == 1) {
+		if (a.numElements() == 1) {
 			out.init(b.shape(), b.dataType());
 			out.asVec<T>() = (b.asVec<T>().array() * a.data<T>()[0]).matrix();
 		}

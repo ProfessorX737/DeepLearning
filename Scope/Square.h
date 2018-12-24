@@ -14,7 +14,7 @@ public:
 	}
 	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx) const {
 		DCHECK_EQ(wrtIdx, 0);
-		dx.multiply(2*in[0]);
+		dx.multiply<T>(2*in[0]);
 	}
 };
 

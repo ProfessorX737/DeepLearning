@@ -22,7 +22,6 @@ private:
 	}
 	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx) const {
 		DCHECK((wrtIdx == 0) || (wrtIdx == 1));
-		out = dx;
 	}
 };
 

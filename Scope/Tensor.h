@@ -61,7 +61,7 @@ public:
 	}
 
 	template<typename T> 
-	Tensor& operator*(T scalar) {
+	Tensor& operator*(const T scalar) const {
 		Tensor res;
 		res.init(shape(), dt_);
 		res.asVec<T>() = (asVec<T>().array() * scalar).matrix();
@@ -172,6 +172,11 @@ typename TTypes<T, NDIMS>::Tensor Tensor::shaped(const dim_init_list& new_dims) 
 	}
 	CHECK_EQ(new_num_elements, numElements());
 	return typename TTypes<T, NDIMS>::Tensor(data<T>(), edims);
+}
+
+template<typename T> 
+Tensor& operator*(const T scalar, const Tensor& t) {
+	return t * scalar;
 }
 
 #include "MatMul.h"
