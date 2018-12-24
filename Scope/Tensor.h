@@ -21,6 +21,8 @@ struct TTypes {
 		Eigen::Aligned> Scalar;
 };
 
+// TODO: optimize for scalars
+// TODO(adv): modern c++ small-object allocation
 class Tensor {
 public:
 	static const int ALIGNMENT = 64;
@@ -57,6 +59,17 @@ public:
 		sharedCopyInit(other);
 		return *this;
 	}
+
+	template<typename T> 
+	Tensor& operator*(T scalar) {
+		Tensor res;
+		res.init(shape(), dt_);
+		res.asVec<T>() = (asVec<T>().array() * scalar).matrix();
+		return res;
+	}
+
+	template<typename T>
+	void multiply(const Tensor& t, bool transA = false, bool transB = false);
 
 	template<size_t NDIMS>
 	Eigen::DSizes<Dim, NDIMS> eigenDims() const;
@@ -142,7 +155,7 @@ typename TTypes<T>::Matrix Tensor::asMatrix(Dim rows, Dim cols) const {
 template<typename T>
 typename TTypes<T>::Vec Tensor::asVec() const { 
 	CHECK_GE(numDims(), 1);
-	CHECK_EQ(DataTypeToEnum<T>::v(), dt_);
+	//CHECK_EQ(DataTypeToEnum<T>::v(), dt_);
 	return typename TTypes<T>::Vec(data<T>(),numElements(),1); 
 }
 
@@ -159,4 +172,13 @@ typename TTypes<T, NDIMS>::Tensor Tensor::shaped(const dim_init_list& new_dims) 
 	}
 	CHECK_EQ(new_num_elements, numElements());
 	return typename TTypes<T, NDIMS>::Tensor(data<T>(), edims);
+}
+
+#include "MatMul.h"
+
+template<typename T>
+void Tensor::multiply(const Tensor& t, bool transA, bool transB) {
+	Tensor thisCopy;
+	thisCopy = *this;
+	MatMulOp<T>::mult(thisCopy, t, *this, transA, transB);
 }

@@ -23,8 +23,7 @@ public:
 	virtual void eval(Tensor& out) const = 0;
 	virtual void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const { eval(out); }
 	virtual DataType dataType() const = 0;
-	//virtual bool deriv(Tensor& out) const = 0;
-	void collectPaths(std::vector<std::vector<int>>& paths);
+	virtual void collectPaths(std::vector<int>& curr, std::vector<std::vector<int>>& paths) const;
 
 	int getClassId() const { return class_id_; }
 	int getId() const { return id_; }

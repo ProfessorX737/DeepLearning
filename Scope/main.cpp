@@ -35,16 +35,21 @@ int main(void) {
 
 	auto w1 = Variable(graph, { I,H }, DT_FLOAT);
 	auto b1 = Variable(graph, { BATCH_SIZE,H }, DT_FLOAT);
-	auto h1 = Tanh(graph, Add(graph, MatMul(graph,x,w1), b1));
+	auto mult = MatMul(graph, x, w1);
+	auto add = Add(graph, mult, b1);
+	auto h1 = Tanh(graph, add);
 	auto w2 = Variable(graph, { H,O }, DT_FLOAT);
 	auto b2 = Variable(graph, { BATCH_SIZE,O }, DT_FLOAT);
 	auto h2 = Add(graph, MatMul(graph,h1,w2), b2);
 	auto sqrDiff = Square(graph, Sub(graph, h2, y));
 
-	w1->init(RandomNormal<float>(0, 0.1));
-	w2->init(RandomNormal<float>(0, 0.1));
-	//w1->init<float>({ 2,2,2,2 });
-	//w2->init<float>({ 2,2 });
+	//w1->init(RandomNormal<float>(0, 0.1));
+	//w2->init(RandomNormal<float>(0, 0.1));
+	w1->init<float>({ 2,2,2,2 });
+	w2->init<float>({ 2,2 });
+	//Tensor t = w1->tensor() * w2->tensor();
+	//cout << t.matrix<float>() << endl;
+
 	b1->init(ZeroInit<float>());
 	b2->init(ZeroInit<float>());
 

@@ -10,22 +10,25 @@ public:
 	MatMulOp(Graph& graph, NodePtr& a, NodePtr& b, bool transA, bool transB)
 		: BinaryOp(graph, a, b, "MatMul"), transA_(transA), transB_(transB) {}
 
-private:
 	using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 	using ConstMatrixMap = Eigen::Map<const Matrix>;
 	using MatrixMap = Eigen::Map<Matrix>;
 
-	ConstMatrixMap constEigenMatrixSlice(const Tensor& t, int slice) const {
+	static ConstMatrixMap constEigenMatrixSlice(const Tensor& t, int slice) {
 		return ConstMatrixMap(t.data<T>() + slice * t.dimSize(1) * t.dimSize(2),
 			t.dimSize(1), t.dimSize(2));
 	}
 
-	MatrixMap eigenMatrixSlice(Tensor& t, int slice) const {
+	static MatrixMap eigenMatrixSlice(Tensor& t, int slice) {
 		return MatrixMap(t.data<T>() + slice * t.dimSize(1) * t.dimSize(2),
 			t.dimSize(1), t.dimSize(2));
 	}
 
 	void binaryOp(const Tensor& a, const Tensor& b, Tensor& out) const override {
+		matmult(a, b, out, transA_, transB_);
+	}
+
+	static void matmult(const Tensor& a, const Tensor& b, Tensor& out, bool transA = false, bool transB = false) {
 		CHECK_EQ(a.numDims(), b.numDims()) 
 			<< "a and b operands have different ndims: " 
 			<< a.dimString() << " vs " << b.dimString();
@@ -55,8 +58,8 @@ private:
 		rA.sharedCopyInit(a, TensorShape({ nbatch,arows,acols }));
 		rB.sharedCopyInit(b, TensorShape({ nbatch,brows,bcols }));
 
-		if (transA_) std::swap(arows, acols);
-		if (transB_) std::swap(bcols, brows);
+		if (transA) std::swap(arows, acols);
+		if (transB) std::swap(bcols, brows);
 
 		CHECK_EQ(acols, brows) 
 			<< "Inner dims must equal: " << a.dimString() << " vs " 
@@ -74,8 +77,8 @@ private:
 			auto matB = constEigenMatrixSlice(rB, i);
 			auto matOut = eigenMatrixSlice(rOut, i);
 
-			if (!transA_) {
-				if (!transB_) {
+			if (!transA) {
+				if (!transB) {
 					matOut.noalias() = matA * matB;
 				}
 				else {
@@ -83,7 +86,7 @@ private:
 				}
 			}
 			else {
-				if (!transB_) {
+				if (!transB) {
 					matOut.noalias() = matA.transpose() * matB;
 				}
 				else {
@@ -91,6 +94,29 @@ private:
 				}
 			}
 		}
+	}
+
+	// allows broadcasting for scalars
+	static void mult(const Tensor& a, const Tensor& b, Tensor& out, bool transA = false, bool transB = false) {
+		if (a.numElements() == 1 && b.numElements() == 1) {
+			out.init<T>({ a.data<T>()[0] * b.data<T>()[0] });
+			return;
+		}
+		else if (a.numElements() == 1) {
+			out.init(b.shape(), b.dataType());
+			out.asVec<T>() = (b.asVec<T>().array() * a.data<T>()[0]).matrix();
+		}
+		else if (b.numElements() == 1) {
+			out.init(a.shape(), a.dataType());
+			out.asVec<T>() = (a.asVec<T>().array() * b.data<T>()[0]).matrix();
+		}
+		else {
+			matmult(a, b, out, transA, transB);
+		}
+	}
+	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx) const override {
+		DCHECK((wrtIdx == 0) || (wrtIdx == 1));
+		dx.multiply<T>(in[1-wrtIdx]);
 	}
 
 	bool transA_;
@@ -109,3 +135,19 @@ inline NodePtr MatMul(Graph& graph, NodePtr a, NodePtr b, bool transA, bool tran
 		transA, transB));
 	return ret;
 }
+
+//template<typename T>
+//Tensor& operator*(Tensor& t, T scalar) {
+//	t.asVec<T>() = t.asVec<T>().array() * scalar;
+//	return t;
+//}
+
+//Tensor& operator*(const Tensor& t1, const Tensor& t2) {
+//	if (t1.numElements() == 1) {
+//		NUMBER_TYPE_CASES(t2.asVec<T>() = )
+//	}
+//	DCHECK_EQ(t1.dataType(), t2.dataType());
+//	Tensor out;
+//	NUMBER_TYPE_CASES(t1.dataType(), MatMulOp<T>::matmult(t2, t1, out));
+//	return out;
+//}

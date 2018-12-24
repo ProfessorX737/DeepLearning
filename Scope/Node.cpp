@@ -1,6 +1,7 @@
 #include "Node.h"
 #include "Tensor.h"
 #include "Graph.h"
+#include <iostream>
 
 Node::Node(Graph& graph, const std::string& class_name) {
 	// set class_id
@@ -17,11 +18,11 @@ Node::Node(Graph& graph, const std::string& class_name) {
 	id_ = graph.getUniqueId();
 }
 
-void Node::collectPaths(std::vector<std::vector<int>>& paths) {
-	std::vector<std::vector<std::vector<int>>> temp;
+void Node::collectPaths(std::vector<int>& curr, std::vector<std::vector<int>>& paths) const {
 	for (int i = 0; i < children_.size(); i++) {
-		temp.emplace_back();
-		children_[i]->collectPaths(temp[i]);
+		std::vector<int> pathToNext = curr;
+		pathToNext.push_back(i);
+		children_[i]->collectPaths(pathToNext,paths);
 	}
 }
 

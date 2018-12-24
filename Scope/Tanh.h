@@ -11,6 +11,9 @@ public:
 		auto outVec = out.asVec<T>();
 		outVec = in.asVec<T>().array().tanh().matrix();
 	}
+	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx) const override {
+		
+	}
 };
 
 inline NodePtr Tanh(Graph& graph, NodePtr in) {

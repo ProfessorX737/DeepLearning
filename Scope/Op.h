@@ -41,6 +41,10 @@ public:
 	DataType dataType() const override {
 		return (NINPUT == 0) ? DT_INVALID : children_[0]->dataType();
 	}
+	//virtual void deriv(Tensor& out, int wrs) const {
+	//	
+	//}
 private:
 	virtual void op(const std::array<Tensor,NINPUT>& in, Tensor& out) const = 0;
+	virtual void deriv(Tensor& dx, const std::array<Tensor, NINPUT>& in, int wrtIdx) const = 0;
 };
