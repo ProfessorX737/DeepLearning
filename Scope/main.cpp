@@ -41,10 +41,10 @@ int main(void) {
 	auto h2 = Add(graph, MatMul(graph,h1,w2), b2);
 	auto sqrDiff = Square(graph, Sub(graph, h2, y));
 
-	w1->init(RandomNormal<float>(0, 0.1));
-	w2->init(RandomNormal<float>(0, 0.1));
-	//w1->init<float>({ 2,2,2,2 });
-	//w2->init<float>({ 2,2 });
+	//w1->init(RandomNormal<float>(0, 0.1));
+	//w2->init(RandomNormal<float>(0, 0.1));
+	w1->init<float>({ 2,2,2,2 });
+	w2->init<float>({ 2,2 });
 	b1->init(ZeroInit<float>());
 	b2->init(ZeroInit<float>());
 

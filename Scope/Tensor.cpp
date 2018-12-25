@@ -1,10 +1,13 @@
 #include "Tensor.h"
 #include <cstdlib>
+#include <stdlib.h>
 #include <memory>
 #include <algorithm>
 #include "logging.h"
-#include <malloc.h>
 #include <stdio.h>
+#if defined(_WIN32) || defined(WIN32)
+#include <malloc.h>
+#endif
 
 Tensor::Tensor() : buffer_(std::make_shared<TensorBuffer>()), dt_(DT_INVALID) {}
 
@@ -68,6 +71,6 @@ void Tensor::TensorBuffer::free()
 #if defined(_WIN32) || defined(WIN32)
 	_aligned_free(data);
 #else
-	free(data);
+	::free(data);
 #endif
 }
