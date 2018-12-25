@@ -35,7 +35,9 @@ int main(void) {
 
 	auto w1 = Variable(graph, { I,H }, DT_FLOAT);
 	auto b1 = Variable(graph, { BATCH_SIZE,H }, DT_FLOAT);
-	auto h1 = Tanh(graph, Add(graph, MatMul(graph,x,w1), b1));
+	auto mult = MatMul(graph, x, w1);
+	auto add = Add(graph, mult, b1);
+	auto h1 = Tanh(graph, add);
 	auto w2 = Variable(graph, { H,O }, DT_FLOAT);
 	auto b2 = Variable(graph, { BATCH_SIZE,O }, DT_FLOAT);
 	auto h2 = Add(graph, MatMul(graph,h1,w2), b2);

@@ -18,6 +18,16 @@ public:
 		auto vecOut = out.asVec<T>();
 		vecOut = vecA - vecB;
 	}
+	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx) const {
+		DCHECK((wrtIdx == 0) || (wrtIdx == 1));
+		if (wrtIdx == 0) {
+			dx.multiply<T>(in[0]);
+		}
+		else {
+			dx.multiply<T>(in[1] * -1);
+		}
+	}
+	
 };
 
 inline NodePtr Sub(Graph& graph, NodePtr a, NodePtr b) {

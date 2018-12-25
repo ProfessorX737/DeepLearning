@@ -9,7 +9,7 @@ typedef std::shared_ptr<PlaceholderOp> PlaceholderPtr;
 PlaceholderPtr Placeholder(Graph& graph, const TensorShape& shape, DataType dt = DT_FLOAT);
 	
 
-class PlaceholderOp : public Node, public std::enable_shared_from_this<PlaceholderOp> {
+class PlaceholderOp : public Node {
 public:
 	PlaceholderOp(Graph& graph, const TensorShape& shape, DataType dt = DT_FLOAT);
 	void eval(Tensor& out) const override;
