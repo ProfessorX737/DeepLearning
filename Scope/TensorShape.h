@@ -16,7 +16,7 @@ public:
 	~TensorShape() {}
 
 	void addDim(Dim d);
-	int numDims() const { return dims_.size(); }
+	int numDims() const { return static_cast<int>(dims_.size()); }
 	int dimSize(int i) const;
 	int numElements() const { return num_elements_; }
 	std::string dimString() const;

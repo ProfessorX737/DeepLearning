@@ -21,7 +21,7 @@ void TensorShape::addDim(Dim d) {
 int TensorShape::dimSize(int i) const {
 	DCHECK_GE(i, -1);
 	DCHECK_LT(i, numDims());
-	return dims_[i];
+	return static_cast<int>(dims_[i]);
 }
 
 std::string TensorShape::dimString() const { 

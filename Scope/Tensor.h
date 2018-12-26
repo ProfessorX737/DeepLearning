@@ -61,11 +61,11 @@ public:
 	}
 
 	template<typename T> 
-	Tensor& operator*(const T scalar) const {
-		Tensor res;
-		res.init(shape(), dt_);
+	Tensor operator*(const T scalar) const {
+        CHECK_EQ(dt_,DataTypeToEnum<T>::v());
+		Tensor res(shape(), dt_);
 		res.asVec<T>() = (asVec<T>().array() * scalar).matrix();
-		return res;
+        return res;
 	}
 
 	template<typename T>
@@ -175,7 +175,7 @@ typename TTypes<T, NDIMS>::Tensor Tensor::shaped(const dim_init_list& new_dims) 
 }
 
 template<typename T> 
-Tensor& operator*(const T scalar, const Tensor& t) {
+Tensor operator*(const T scalar, const Tensor& t) {
 	return t * scalar;
 }
 

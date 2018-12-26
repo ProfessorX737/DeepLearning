@@ -4,15 +4,15 @@
 template<typename T>
 class TanhOp : public UnaryOp {
 public:
-	TanhOp(Graph& graph, NodePtr& in) : UnaryOp(graph, in, "Tanh") {}
+    TanhOp(Graph& graph, NodePtr& in) : UnaryOp(graph, in, "Tanh") {}
+
 	void unaryOp(const Tensor& in, Tensor& out) const override {
-		TensorShape outShape = in.shape();
-		out.init(outShape, in.dataType());
+		out.init(in.shape(), in.dataType());
 		auto outVec = out.asVec<T>();
 		outVec = in.asVec<T>().array().tanh().matrix();
 	}
 	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx) const override {
-		
+        
 	}
 };
 

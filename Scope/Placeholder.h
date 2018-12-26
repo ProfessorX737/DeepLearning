@@ -12,7 +12,6 @@ PlaceholderPtr Placeholder(Graph& graph, const TensorShape& shape, DataType dt =
 class PlaceholderOp : public Node {
 public:
 	PlaceholderOp(Graph& graph, const TensorShape& shape, DataType dt = DT_FLOAT);
-	void eval(Tensor& out) const override;
 	void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const override;
 	DataType dataType() const override { return dt_; }
 	TensorShape shape() { return shape_; }

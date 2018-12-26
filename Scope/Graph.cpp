@@ -22,9 +22,27 @@ void Graph::eval(NodePtr& fetch, Tensor& out) {
 	fetch->eval(out);
 }
 
-void Graph::eval(const std::unordered_map<NodePtr,Tensor>& feed_inputs, const std::vector<NodePtr>& fetch_outputs, std::vector<Tensor>& out) {
-	int numOut = fetch_outputs.size();
-	std::unordered_map<int, Tensor> nodeTensorMap;
+void Graph::eval(const std::unordered_map<NodePtr,Tensor>& feed_inputs, const std::vector<NodePtr>& fetch_outputs,
+                 std::vector<Tensor>& out) {
+//	int numOut = static_cast<int>(fetch_outputs.size());
+//	std::unordered_map<int, Tensor> nodeTensorMap;
+//	for (auto it : feed_inputs) {
+//		nodeTensorMap[it.first->getId()] = std::move(it.second);
+//	}
+//	for (int i = 0; i < numOut; i++) {
+//		Tensor res;
+//		fetch_outputs[i]->eval(nodeTensorMap, res);
+//		out.push_back(std::move(res));
+//	}
+    std::unordered_map<int, Tensor> nodeTensorMap;
+    eval(nodeTensorMap,feed_inputs,fetch_outputs,out);
+}
+
+void Graph::eval(std::unordered_map<int,Tensor>& nodeTensorMap,
+                 const std::unordered_map<NodePtr,Tensor>& feed_inputs,
+                 const std::vector<NodePtr>& fetch_outputs,
+                 std::vector<Tensor>& out) {
+	int numOut = static_cast<int>(fetch_outputs.size());
 	for (auto it : feed_inputs) {
 		nodeTensorMap[it.first->getId()] = std::move(it.second);
 	}

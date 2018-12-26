@@ -8,10 +8,6 @@ PlaceholderPtr Placeholder(Graph& graph, const TensorShape& shape, DataType dt) 
 PlaceholderOp::PlaceholderOp(Graph& graph, const TensorShape& shape, DataType dt) 
 	: Node(graph, "Placeholder"), shape_(std::move(shape)), dt_(dt) {}
 
-void PlaceholderOp::eval(Tensor& out) const {
-	LOG(FATAL) << "Placeholder with node id: " << getId() << ", needs to be fed a value";
-}
-
 void PlaceholderOp::eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const {
 	auto it = nodeTensorMap.find(getId());
 	if (it == nodeTensorMap.end()) LOG(FATAL) << "Missing placeholder input";

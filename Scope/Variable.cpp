@@ -24,7 +24,3 @@ Tensor VariableOp::tensor() {
 void VariableOp::collectPaths(std::vector<int>& curr, std::vector<std::vector<int>>& paths) const {
 	paths.push_back(curr);
 }
-
-//bool VariableOp::deriv(Tensor& out) const {
-//	out = Tensor(t_.shape(), t_.dataType());
-//}

@@ -10,12 +10,32 @@ Node::Node(Graph& graph, const std::string& class_name) {
 		class_id_ = it->second;
 	}
 	else {
-		class_id_ = classIdMap.size();
+		class_id_ = static_cast<int>(classIdMap.size());
 		classIdMap[class_name] = class_id_;
 	}
 	class_name_ = class_name;
 	// set scope_id
 	id_ = graph.getUniqueId();
+}
+
+void Node::eval(Tensor& out) const {
+    std::unordered_map<int,Tensor> nodeTensorMap;
+    eval(nodeTensorMap,out);
+};
+
+void Node::eval(std::unordered_map<int,Tensor>& nodeTensorMap) const {
+    Tensor out;
+    eval(nodeTensorMap,out);
+}
+
+DataType Node::dataType() const {
+    LOG(ERROR) << "dataType() function not implemented in node " << class_name_;
+    return DT_INVALID;
+}
+
+void Node::collectPaths(std::vector<std::vector<int>>& paths) const {
+    std::vector<int> curr;
+    collectPaths(curr, paths);
 }
 
 void Node::collectPaths(std::vector<int>& curr, std::vector<std::vector<int>>& paths) const {

@@ -16,8 +16,16 @@ public:
 	Graph();
 	~Graph();
 
-	void eval(NodePtr& fetch_output, Tensor& out);
-	void eval(const std::unordered_map<NodePtr,Tensor>& feed_inputs, const std::vector<NodePtr>& fetch_outputs, std::vector<Tensor>& out);
+	static void eval(NodePtr& fetch_output, Tensor& out);
+    
+	static void eval(const std::unordered_map<NodePtr,Tensor>& feed_inputs,
+                     const std::vector<NodePtr>& fetch_outputs,
+                     std::vector<Tensor>& out);
+    
+    static void eval(std::unordered_map<int,Tensor>& nodeTensorMap,
+                     const std::unordered_map<NodePtr,Tensor>& feed_inputs,
+                     const std::vector<NodePtr>& fetch_outputs,
+                     std::vector<Tensor>& out);
 
 	// deprecated, use eval(). here for reference
 	//void eval_(const std::unordered_map<int, Tensor>& feed_inputs, const std::vector<Node*>& fetch_outputs, std::vector<Tensor>& out);
