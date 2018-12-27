@@ -19,17 +19,18 @@ using namespace std;
 
 int main(void) {
     Graph graph;
-    auto w1 = Variable(graph,{1,1},DT_FLOAT);
-    auto w2 = Variable(graph, {1,1}, DT_FLOAT);
+    auto w1 = Variable(graph,{1,2},DT_FLOAT);
+    auto w2 = Variable(graph, {1,2}, DT_FLOAT);
     auto sqrDiff = Square(graph, Sub(graph,w2,w1));
     auto error = Multiply(graph, sqrDiff, 0.5f);
     auto optimizer = OptimizerOp<float>(graph,error);
-    w1->init<float>({1});
-    w2->init<float>({3});
+    w1->init<float>({1,1});
+    w2->init<float>({3,3});
     
     Tensor dx;
     optimizer.evalDeriv(dx);
-    cout << dx.asVec<float>() << endl;
+    cout << dx.matrix<float>() << endl;
+    cout << dx.dimString() << endl;
     return 0;
 }
 
