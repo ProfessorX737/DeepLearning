@@ -1,4 +1,7 @@
 DeepLearning/
 Graph/
 *.vscode
-
+*Debug/
+*.vcxproj*
+tutorials/
+*.sln
