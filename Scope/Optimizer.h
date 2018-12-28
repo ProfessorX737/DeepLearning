@@ -14,9 +14,7 @@ class OptimizerOp : public Node {
 public:
     OptimizerOp(Graph& graph, NodePtr minimize) : Node(graph,"Optimizer"), minimize_(minimize) {
         dt_ = DataTypeToEnum<T>::v();
-        one.init({1,1},dt_);
-        one.fill<T>({1});
-        minimize_->collectPaths(paths_);
+        minimize_->collectPaths(paths_,variables_);
     }
     ~OptimizerOp() {}
     
@@ -24,12 +22,7 @@ public:
     void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const override {
         minimize_->eval(nodeTensorMap,out);
         std::vector<Tensor> gradients;
-        for(int i = 0; i < paths_.size(); i++) {
-            Tensor dx;
-            dx.init<T>({1});
-            minimize_->evalDeriv(dx,nodeTensorMap,paths_[i],0);
-            gradients.push_back(dx);
-        }
+        //minimize_->evalGradients<T>(nodeTensorMap, paths_, gradients);
         
         // update all variables using the gradient dx ...
     }
@@ -44,8 +37,8 @@ public:
     
 private:
     std::vector<std::vector<int>> paths_;
+    std::vector<Tensor> variables_;
     NodePtr minimize_;
-    Tensor one;
     DataType dt_;
 };
 

@@ -116,7 +116,7 @@ void Tensor::fill(const std::initializer_list<T>& init_list) {
 
 template<typename T> 
 void Tensor::init(const std::initializer_list<T>& init_list) {
-	init(TensorShape({ static_cast<Eigen::Index>(init_list.size()) }), DataTypeToEnum<T>::v());
+    init(TensorShape({ static_cast<Eigen::Index>(init_list.size()),1 }), DataTypeToEnum<T>::v());
 	std::copy_n(init_list.begin(), init_list.size(), data<T>());
 }
 

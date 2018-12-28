@@ -18,31 +18,48 @@ Node::Node(Graph& graph, const std::string& class_name) {
 	id_ = graph.getUniqueId();
 }
 
+DataType Node::dataType() const {
+    LOG(ERROR) << "dataType() function not implemented in node " << class_name_;
+    return DT_INVALID;
+}
+
+template<typename T>
+void Node::evalGradients(std::unordered_map<int,Tensor>& nodeTensorMap, const std::vector<std::vector<int>>& paths,
+                         std::vector<Tensor>& outGrads) const {
+    outGrads.clear();
+    DataType dt = DataTypeToEnum<T>::v();
+    for(int i = 0; i < paths.size(); i++) {
+        Tensor dx({1,1},dt);
+        dx.fill<T>({1});
+        outGrads.push_back(dx);
+    }
+    for(int i = 0; i < paths.size(); i++) {
+        evalDeriv(outGrads[i], nodeTensorMap, paths[i], 0);
+    }
+}
+
 void Node::eval(Tensor& out) const {
     std::unordered_map<int,Tensor> nodeTensorMap;
     eval(nodeTensorMap,out);
-};
+}
 
 void Node::eval(std::unordered_map<int,Tensor>& nodeTensorMap) const {
     Tensor out;
     eval(nodeTensorMap,out);
 }
 
-DataType Node::dataType() const {
-    LOG(ERROR) << "dataType() function not implemented in node " << class_name_;
-    return DT_INVALID;
-}
 
-void Node::collectPaths(std::vector<std::vector<int>>& paths) const {
+void Node::collectPaths(std::vector<std::vector<int>>& outPaths, std::vector<Tensor>& outVariables) const {
     std::vector<int> curr;
-    collectPaths(curr, paths);
+    collectPaths(curr, outPaths, outVariables);
 }
 
-void Node::collectPaths(std::vector<int>& curr, std::vector<std::vector<int>>& paths) const {
+void Node::collectPaths(std::vector<int>& curr, std::vector<std::vector<int>>& outPaths,
+                        std::vector<Tensor>& outVariables) const {
 	for (int i = 0; i < children_.size(); i++) {
 		std::vector<int> pathToNext = curr;
 		pathToNext.push_back(i);
-		children_[i]->collectPaths(pathToNext,paths);
+		children_[i]->collectPaths(pathToNext,outPaths,outVariables);
 	}
 }
 

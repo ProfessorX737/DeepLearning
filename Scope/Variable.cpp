@@ -21,6 +21,8 @@ Tensor VariableOp::tensor() {
 	return std::move(t);
 }
 
-void VariableOp::collectPaths(std::vector<int>& curr, std::vector<std::vector<int>>& paths) const {
-	paths.push_back(curr);
+void VariableOp::collectPaths(std::vector<int>& curr, std::vector<std::vector<int>>& outPaths,
+                              std::vector<Tensor>& outVariables) const {
+	outPaths.push_back(curr);
+    outVariables.push_back(t_);
 }

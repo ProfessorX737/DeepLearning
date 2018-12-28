@@ -20,7 +20,8 @@ public:
 	template<typename T>
 	void init(const std::initializer_list<T>& list) { t_.fill<T>(list); }
     void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const override { out = t_; };
-	void collectPaths(std::vector<int>& curr, std::vector<std::vector<int>>& paths) const override;
+    void collectPaths(std::vector<int>& curr, std::vector<std::vector<int>>& outPaths,
+                      std::vector<Tensor>& outVariables) const override;
 	//bool deriv(Tensor& out) const;
 	DataType dataType() const override { return t_.dataType(); }
 	Tensor tensor();
