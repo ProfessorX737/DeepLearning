@@ -9,6 +9,8 @@
 #pragma once
 #include "Node.h"
 
+static std::vector<Tensor> gradients_;
+
 template<typename T>
 class OptimizerOp : public Node {
 public:
@@ -21,8 +23,12 @@ public:
     // does not change 'out' arg
     void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const override {
         minimize_->eval(nodeTensorMap,out);
-        std::vector<Tensor> gradients;
-        //minimize_->evalGradients<T>(nodeTensorMap, paths_, gradients);
+        for(int i = 0; i < paths_.size(); i++) {
+            Tensor dx({1,1},dt_);
+            dx.fill<T>({1});
+            gradients_.push_back(dx);
+        }
+        minimize_->evalGradients(nodeTensorMap, paths_, gradients_);
         
         // update all variables using the gradient dx ...
     }
@@ -33,6 +39,10 @@ public:
         std::unordered_map<int,Tensor> nodeTensorMap;
         minimize_->eval(nodeTensorMap);
         minimize_->evalDeriv(dx,nodeTensorMap,paths_[1],0);
+    }
+    
+    std::vector<Tensor> getGradients() {
+        return gradients_;
     }
     
 private:

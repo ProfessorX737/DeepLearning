@@ -23,18 +23,12 @@ DataType Node::dataType() const {
     return DT_INVALID;
 }
 
-template<typename T>
 void Node::evalGradients(std::unordered_map<int,Tensor>& nodeTensorMap, const std::vector<std::vector<int>>& paths,
-                         std::vector<Tensor>& outGrads) const {
-    outGrads.clear();
-    DataType dt = DataTypeToEnum<T>::v();
+                         std::vector<Tensor>& inOutGrads) const {
+    DCHECK_EQ(inOutGrads.size(),paths.size()) << "outGrads vector must contain same number of tensors"
+                                            << " as number of paths";
     for(int i = 0; i < paths.size(); i++) {
-        Tensor dx({1,1},dt);
-        dx.fill<T>({1});
-        outGrads.push_back(dx);
-    }
-    for(int i = 0; i < paths.size(); i++) {
-        evalDeriv(outGrads[i], nodeTensorMap, paths[i], 0);
+        evalDeriv(inOutGrads[i], nodeTensorMap, paths[i], 0);
     }
 }
 

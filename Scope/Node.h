@@ -31,9 +31,8 @@ public:
     // calculates the derivatives of this node with respect to each variable that make up this node.
     // takes in the nodeTensorMap that is created from the eval(&nodeTensorMap,&out) function.
     // returns a vector of gradients @outGrads.
-    template<typename T>
     void evalGradients(std::unordered_map<int,Tensor>& nodeTensorMap, const std::vector<std::vector<int>>& paths,
-                       std::vector<Tensor>& outGrads) const;
+                       std::vector<Tensor>& inOutGrads) const;
     
     // only to be overridden in class Op
     // helper recursive function for evalGradients
