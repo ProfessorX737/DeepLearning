@@ -32,10 +32,10 @@ public:
         minimize_->evalGradients(nodeTensorMap, paths_, gradients_);
         
         // update all variables using the gradient dx ...
-		//updateVariables(variables_, gradients);
+		updateVariables(variables_, gradients);
     }
 
-	//virtual void updateVariables(std::vector<Tensor>& variables, const std::vector<Tensor>& gradients) = 0;
+	virtual void updateVariables(std::vector<Tensor>& variables, const std::vector<Tensor>& gradients) = 0;
     
     // for testing the derivative
     void evalDeriv(Tensor& dx) {

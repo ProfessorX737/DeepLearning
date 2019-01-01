@@ -77,7 +77,6 @@ int main(void) {
 	b1->init(ZeroInit<float>());
 	b2->init(ZeroInit<float>());
 
-
 	//auto optimizer = OptimizerOp<float>(graph, error);
     auto optimizer = std::make_shared<OptimizerOp<float>>(graph,error);
 	std::vector<Tensor> out;
