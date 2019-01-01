@@ -20,17 +20,24 @@ using namespace std;
 //int main(void) {
 //    Graph graph;
 //    auto w1 = Variable(graph,{1,2},DT_FLOAT);
-//    auto w2 = Variable(graph, {1,2}, DT_FLOAT);
-//    auto sqrDiff = Square(graph, Sub(graph,w2,w1));
-//    auto error = Multiply(graph, sqrDiff, 0.5f);
-//    auto optimizer = OptimizerOp<float>(graph,error);
-//    w1->init<float>({1,1});
-//    w2->init<float>({3,3});
+//    //auto w2 = Variable(graph, {1,2}, DT_FLOAT);
+//    auto sqr = Square(graph, w1);
+//    //auto error = Multiply(graph, sqrDiff, 0.5f);
+//	auto tanh = Tanh(graph, sqr);
+//    auto optimizer = std::make_shared<OptimizerOp<float>>(graph,tanh);
+//    w1->init<float>({0.5f,0.6f});
+//
+//	//std::vector<Tensor> out;
+//	Tensor out;
+//	Graph::eval(optimizer, out);
+//    for(int i = 0; i < gradients_.size(); i++) {
+//        cout << gradients_[i].matrix<float>() << endl << endl;
+//    }
 //    
-//    Tensor dx;
-//    optimizer.evalDeriv(dx);
-//    cout << dx.matrix<float>() << endl;
-//    cout << dx.dimString() << endl;
+//    //Tensor dx;
+//    //optimizer.evalDeriv(dx);
+//    //cout << dx.matrix<float>() << endl;
+//    //cout << dx.dimString() << endl;
 //	cin.get();
 //    return 0;
 //}
@@ -56,10 +63,10 @@ int main(void) {
 	auto b1 = Variable(graph, { BATCH_SIZE,H }, DT_FLOAT);
 	auto mult = MatMul(graph, x, w1);
 	auto add = Add(graph, mult, b1);
-	//auto h1 = Tanh(graph, add);
+	auto h1 = Tanh(graph, add);
 	auto w2 = Variable(graph, { H,O }, DT_FLOAT);
 	auto b2 = Variable(graph, { BATCH_SIZE,O }, DT_FLOAT);
-	auto h2 = Add(graph, MatMul(graph,add,w2), b2);
+	auto h2 = Add(graph, MatMul(graph,h1,w2), b2);
 	auto sqrDiff = Square(graph, Sub(graph, h2, y));
 	auto error = Multiply(graph, sqrDiff, 0.5f);
 

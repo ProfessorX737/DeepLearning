@@ -16,7 +16,7 @@ public:
 	Graph();
 	~Graph();
 
-	static void eval(NodePtr& fetch_output, Tensor& out);
+	static void eval(NodePtr fetch_output, Tensor& out);
     
 	static void eval(const std::unordered_map<NodePtr,Tensor>& feed_inputs,
                      const std::vector<NodePtr>& fetch_outputs,

@@ -68,8 +68,11 @@ public:
         return res;
 	}
 
+	template<typename T, typename S>
+	Tensor scalarMult(const S scalar) const;
+
 	template<typename T>
-	void multiply(const Tensor& t, bool transA = false, bool transB = false);
+	Tensor cWiseMult(const Tensor& other) const;
 
 	template<size_t NDIMS>
 	Eigen::DSizes<Dim, NDIMS> eigenDims() const;
@@ -179,11 +182,18 @@ Tensor operator*(const T scalar, const Tensor& t) {
 	return t * scalar;
 }
 
-#include "MatMul.h"
+#include "Multiply.h"
+
+template<typename T, typename S>
+Tensor Tensor::scalarMult(const S scalar) const {
+	Tensor res;
+	ScalarMultiplyOp<T>::scalarMultiply(*this, static_cast<T>(scalar), res);
+	return res;
+}
 
 template<typename T>
-void Tensor::multiply(const Tensor& t, bool transA, bool transB) {
-	Tensor thisCopy;
-	thisCopy = *this;
-	MatMulOp<T>::mult(thisCopy, t, *this, transA, transB);
+Tensor Tensor::cWiseMult(const Tensor& other) const {
+	Tensor res;
+	CWiseMultiplyOp<T>::cWiseMultiply(*this, other, res);
+	return res;
 }

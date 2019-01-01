@@ -20,9 +20,10 @@ public:
     }
     ~OptimizerOp() {}
     
-    // does not change 'out' arg
+	// out tensor will be evaluated to be same as the minimize_ node
     void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const override {
         minimize_->eval(nodeTensorMap,out);
+		//std::vector<Tensor> gradients;
         for(int i = 0; i < paths_.size(); i++) {
             Tensor dx({1,1},dt_);
             dx.fill<T>({1});
@@ -31,7 +32,10 @@ public:
         minimize_->evalGradients(nodeTensorMap, paths_, gradients_);
         
         // update all variables using the gradient dx ...
+		//updateVariables(variables_, gradients);
     }
+
+	//virtual void updateVariables(std::vector<Tensor>& variables, const std::vector<Tensor>& gradients) = 0;
     
     // for testing the derivative
     void evalDeriv(Tensor& dx) {
@@ -52,8 +56,8 @@ private:
     DataType dt_;
 };
 
-inline NodePtr Optimizer(Graph& graph, NodePtr minimize) {
-    NodePtr ret;
-    NUMBER_TYPE_CASES(minimize->dataType(),ret = std::make_shared<OptimizerOp<T>>(graph,minimize));
-    return ret;
-}
+//inline NodePtr Optimizer(Graph& graph, NodePtr minimize) {
+//    NodePtr ret;
+//    NUMBER_TYPE_CASES(minimize->dataType(),ret = std::make_shared<OptimizerOp<T>>(graph,minimize));
+//    return ret;
+//}

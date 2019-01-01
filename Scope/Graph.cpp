@@ -18,7 +18,7 @@ int Graph::getUniqueId() {
 	return numNodes_++;
 }
 
-void Graph::eval(NodePtr& fetch, Tensor& out) {
+void Graph::eval(NodePtr fetch, Tensor& out) {
 	fetch->eval(out);
 }
 

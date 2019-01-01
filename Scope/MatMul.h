@@ -112,7 +112,12 @@ public:
 	}
 	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx) const override {
 		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
-		dx.multiply<T>(in[1-wrtIdx]);
+		if (wrtIdx == 0) {
+			matmult(dx, in[1 - wrtIdx], dx, false, true);
+		}
+		else {
+			matmult(in[1 - wrtIdx], dx, dx, true, false);
+		}
 	}
 
 	bool transA_;

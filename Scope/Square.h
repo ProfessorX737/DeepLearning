@@ -14,7 +14,7 @@ public:
 	}
 	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx) const override {
 		DCHECK_EQ(wrtIdx, 0);
-		dx.multiply<T>(in[0]*static_cast<T>(2));
+		dx = dx.cWiseMult<T>(in[0].scalarMult<T>(2));
 	}
 };
 
