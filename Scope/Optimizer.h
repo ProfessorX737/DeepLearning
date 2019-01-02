@@ -9,8 +9,6 @@
 #pragma once
 #include "Node.h"
 
-static std::vector<Tensor> gradients_;
-
 template<typename T>
 class OptimizerOp : public Node {
 public:
@@ -21,9 +19,9 @@ public:
     ~OptimizerOp() {}
     
 	// out tensor will be evaluated to be same as the minimize_ node
-    void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const override {
+    void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) override {
         minimize_->eval(nodeTensorMap,out);
-		//std::vector<Tensor> gradients;
+        gradients_.clear();
         for(int i = 0; i < paths_.size(); i++) {
             Tensor dx({1,1},dt_);
             dx.fill<T>({1});
@@ -37,27 +35,14 @@ public:
 
 	virtual void updateVariables(std::vector<Tensor>& variables, const std::vector<Tensor>& gradients) = 0;
     
-    // for testing the derivative
-    void evalDeriv(Tensor& dx) {
-        dx.init<T>({1});
-        std::unordered_map<int,Tensor> nodeTensorMap;
-        minimize_->eval(nodeTensorMap);
-        minimize_->evalDeriv(dx,nodeTensorMap,paths_[1],0);
-    }
-    
-    std::vector<Tensor> getGradients() {
+    std::vector<Tensor>& getGradients() {
         return gradients_;
     }
     
 private:
     std::vector<std::vector<int>> paths_;
     std::vector<Tensor> variables_;
+    std::vector<Tensor> gradients_;
     NodePtr minimize_;
     DataType dt_;
 };
-
-//inline NodePtr Optimizer(Graph& graph, NodePtr minimize) {
-//    NodePtr ret;
-//    NUMBER_TYPE_CASES(minimize->dataType(),ret = std::make_shared<OptimizerOp<T>>(graph,minimize));
-//    return ret;
-//}

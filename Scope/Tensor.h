@@ -4,6 +4,7 @@
 #include <memory>
 #include "TensorShape.h"
 #include "types.h"
+#include <iostream>
 
 template<typename T, size_t NDIMS = 1>
 struct TTypes {

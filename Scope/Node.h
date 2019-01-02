@@ -23,7 +23,7 @@ public:
     // evaluates this node by recursively evaluating all the children of this node
     // returns the output Tensor of this node @out
     // returns the all the tensors that are required to evaluate this node @nodeTensorMap
-    virtual void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const = 0;
+    virtual void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) = 0;
     
     // override if node can be an operand to another node
     virtual DataType dataType() const;
@@ -41,11 +41,11 @@ public:
 
     // returns the output result of this node @out
     // not to be overridden in any new nodes created
-    virtual void eval(Tensor& out) const;
+    virtual void eval(Tensor& out);
     
     // returns the all the tensors and their correspondings nodes that are required
     // to evaluate this node @nodeTensorMap
-    void eval(std::unordered_map<int,Tensor>& nodeTensorMap) const;
+    void eval(std::unordered_map<int,Tensor>& nodeTensorMap);
     
     // returns a vector of paths-to-variables
     void collectPaths(std::vector<std::vector<int>>& outPaths, std::vector<Tensor>& outVariables) const;

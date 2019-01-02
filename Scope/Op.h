@@ -12,14 +12,14 @@ public:
 			children_.push_back(std::move(operands[i]));
 		}
 	}
-	void eval(Tensor& out) const override {
+	void eval(Tensor& out) override {
 		std::array<Tensor, NINPUT> in;
 		for (int i = 0; i < NINPUT; i++) {
 			children_[i]->eval(in[i]);
 		}
 		op(in,out);
 	}
-	void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) const override {
+	void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) override {
 
 		std::array<Tensor, NINPUT> in;
 		for (int i = 0; i < NINPUT; i++) {

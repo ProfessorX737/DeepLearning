@@ -16,6 +16,7 @@ public:
 		//dx.multiply<T>(1 - in[0].asVec<T>().array().tanh().square());
 		Tensor dtanh(in[0].shape(), in[0].dataType());
 		dtanh.asVec<T>() = (1 - in[0].asVec<T>().array().tanh().square()).matrix();
+
 		dx = dx.cWiseMult<T>(dtanh);
 	}
 };
