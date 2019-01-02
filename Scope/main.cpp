@@ -12,8 +12,9 @@
 #include "Sub.h"
 #include "Graph.h"
 #include "Multiply.h"
-#include "Optimizer.h"
+//#include "Optimizer.h"
 #include <vector>
+#include "GradientDescent.h"
 
 using namespace std;
 
@@ -78,7 +79,8 @@ int main(void) {
 	b2->init(ZeroInit<float>());
 
 	//auto optimizer = OptimizerOp<float>(graph, error);
-    auto optimizer = std::make_shared<OptimizerOp<float>>(graph,error);
+    //auto optimizer = std::make_shared<GradientDescentOp<float>>(graph,error,1);
+    auto optimizer = std::make_shared<GradientDescentOp<float>>(graph,error,1.0f);
 	std::vector<Tensor> out;
     Graph::eval({ {x,data},{y,label} }, { optimizer }, out);
     
