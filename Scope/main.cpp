@@ -16,6 +16,7 @@
 #include "GradientDescent.h"
 #include "MomentumDescent.h"
 #include "Sigmoid.h"
+#include <ctime>
 
 using namespace std;
 
