@@ -6,7 +6,7 @@
 class PlaceholderOp;
 
 typedef std::shared_ptr<PlaceholderOp> PlaceholderPtr;
-PlaceholderPtr Placeholder(Graph& graph, const TensorShape& shape, DataType dt = DT_FLOAT);
+PlaceholderPtr Placeholder(Graph& graph, const TensorShape& shape, DataType dt);
 	
 
 class PlaceholderOp : public Node {
