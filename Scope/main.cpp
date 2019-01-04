@@ -148,7 +148,7 @@ int main(void) {
 //  b1->init<double>({0.35,0.35});
 //  b2->init<double>({0.6});
 
-    auto optimizer = std::make_shared<MomentumDescentOp<double>>(graph,error,0.2f,0.8f);
+    auto optimizer = std::make_shared<MomentumDescentOp<double>>(graph,error,0.25f,0.5f);
     
     std::srand(static_cast<uint>(std::time(NULL)));
 

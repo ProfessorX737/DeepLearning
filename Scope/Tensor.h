@@ -159,7 +159,6 @@ typename TTypes<T>::Matrix Tensor::asMatrix(Dim rows, Dim cols) const {
 template<typename T>
 typename TTypes<T>::Vec Tensor::asVec() const { 
 	CHECK_GE(numDims(), 1);
-	//CHECK_EQ(DataTypeToEnum<T>::v(), dt_);
 	return typename TTypes<T>::Vec(data<T>(),numElements(),1); 
 }
 
@@ -185,6 +184,8 @@ Tensor operator*(const T scalar, const Tensor& t) {
 
 #include "Multiply.h"
 
+// multiplies tensor by a scalar element-wise
+// expensive as it allocates a new tensor on the heap
 template<typename T, typename S>
 Tensor Tensor::scalarMult(const S scalar) const {
 	Tensor res;
@@ -192,6 +193,8 @@ Tensor Tensor::scalarMult(const S scalar) const {
 	return res;
 }
 
+// multiplies two tensors together element-wise
+// expensive as it allocates a new tensor on the heap
 template<typename T>
 Tensor Tensor::cWiseMult(const Tensor& other) const {
 	Tensor res;

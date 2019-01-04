@@ -6,12 +6,14 @@ template<typename T>
 class SquareOp : public UnaryOp {
 public:
 	SquareOp(Graph& graph, NodePtr& in) : UnaryOp(graph, in, "Square") {}
+    
 	void unaryOp(const Tensor& in, Tensor& out) const override {
 		TensorShape outShape = in.shape();
 		out.init(outShape, in.dataType());
 		auto outVec = out.asVec<T>();
 		outVec = in.asVec<T>().array().square().matrix();
 	}
+    
 	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx) const override {
 		DCHECK_EQ(wrtIdx, 0);
 		dx = dx.cWiseMult<T>(in[0].scalarMult<T>(2));
