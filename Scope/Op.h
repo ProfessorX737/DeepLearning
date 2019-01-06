@@ -64,12 +64,12 @@ public:
 		}
         
         int wrtIdx = path[pathIndex];
-        deriv(dx,in,wrtIdx);
-        //std::cout << class_name_ << " " << dx.asVec<float>() << " " << in[0].template asVec<float>() << std::endl;
+        deriv(dx, in, wrtIdx, nodeTensorMap);
         children_[wrtIdx]->evalDeriv(dx, nodeTensorMap, path, pathIndex+1);
     }
 
 private:
 	virtual void op(const std::array<Tensor,NINPUT>& in, Tensor& out) const = 0;
-	virtual void deriv(Tensor& dx, const std::array<Tensor, NINPUT>& in, int wrtIdx) const = 0;
+    virtual void deriv(Tensor& dx, const std::array<Tensor, NINPUT>& in, int wrtIdx,
+                       const std::unordered_map<int,Tensor>& nodeTensorMap) const = 0;
 };

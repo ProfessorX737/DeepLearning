@@ -11,13 +11,15 @@ public:
 		auto outVec = out.asVec<T>();
 		outVec = in.asVec<T>().array().tanh().matrix();
 	}
-	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx) const override {
+	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx,
+               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
 		CHECK_EQ(wrtIdx, 0);
-		//dx.multiply<T>(1 - in[0].asVec<T>().array().tanh().square());
-		Tensor dtanh(in[0].shape(), in[0].dataType());
-		dtanh.asVec<T>() = (1 - in[0].asVec<T>().array().tanh().square()).matrix();
-
-		dx = dx.cWiseMult<T>(dtanh);
+        auto it = nodeTensorMap.find(getId());
+        if(it == nodeTensorMap.end()) {
+            LOG(FATAL) << "Could not find pre evaluated tanh for tanh derivative";
+        }
+        Tensor tanh = it->second;
+        dx.asVec<T>().array() = dx.asVec<T>().array() * (1 - tanh.asVec<T>().array().square());
 	}
 };
 

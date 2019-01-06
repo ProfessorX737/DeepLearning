@@ -149,11 +149,12 @@ int main(void) {
 //  b1->init<double>({0.35,0.35});
 //  b2->init<double>({0.6});
 
-    auto optimizer = std::make_shared<MomentumDescentOp<double>>(graph,error,0.25f,0.5f);
+    //auto optimizer = std::make_shared<MomentumDescentOp<double>>(graph,error,0.25f,0.5f);
+    auto optimizer = MomentumDescent(graph, error, 0.2f, 0.5f);
     
     std::srand(static_cast<uint>(std::time(NULL)));
 
-    for(int i = 0; i < 2000; i++) {
+    for(int i = 0; i < 5000; i++) {
         const int d1 = rand() % 2;
         const int d2 = rand() % 2;
         const int d3 = d1 ^ d2;

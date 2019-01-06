@@ -18,7 +18,7 @@ public:
     }
     ~OptimizerOp() {}
     
-	// out tensor will be evaluated to be same as the minimize_ node
+	// out tensor will have same evaluated result as the minimize_ node
     void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) override {
         minimize_->eval(nodeTensorMap,out);
         gradients_.clear();

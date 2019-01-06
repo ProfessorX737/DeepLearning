@@ -52,6 +52,7 @@ public:
 	std::string dimString() const { return shape_.dimString(); }
 	TensorShape shape() const { return shape_; }
 	int dataTypeSize() { return dt_size_; }
+    bool hasSameShape(const Tensor& other) const { return shape_.isSameShape(other.shape()); }
 
 	template<typename T> 
 	T* data() const { return reinterpret_cast<T*>(buffer_->data); }
@@ -159,7 +160,7 @@ typename TTypes<T>::Matrix Tensor::asMatrix(Dim rows, Dim cols) const {
 template<typename T>
 typename TTypes<T>::Vec Tensor::asVec() const { 
 	CHECK_GE(numDims(), 1);
-	return typename TTypes<T>::Vec(data<T>(),numElements(),1); 
+	return typename TTypes<T>::Vec(data<T>(),numElements(),1);
 }
 
 template<typename T, size_t NDIMS>

@@ -24,7 +24,8 @@ public:
         out.init(in.shape(),in.dataType());
         out.asVec<T>() = (in.asVec<T>().array() * scalar).matrix();
 	}
-	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx) const override {
+    void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx,
+               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
 		dx.asVec<T>() = (dx.asVec<T>().array() * scalar_).matrix();
 	}
 private:
@@ -52,24 +53,30 @@ public:
 			out.asVec<T>() = (a.asVec<T>().array() * b.data<T>()[0]).matrix();
 		}
 		else {
-			CHECK_EQ(a.numDims(), b.numDims()) 
-				<< "a and b operands must have same number of dims for cwise multiplication: " 
-				<< a.dimString() << " vs " << b.dimString();
-
-			const int ndims = a.numDims();
-			for (int i = 0; i < ndims; i++) {
-				CHECK_EQ(a.dimSize(i), b.dimSize(i))
-					<< "dimSize(" << i << ") of" << a.dimString() << " and " 
-					<< b.dimString() << " must be the same";
-			}
+            CHECK(a.hasSameShape(b)) << "operand tensors for cwise multiplication must have same shapes: " << a.dimString() << " vs " << b.dimString();
 			out.init(a.shape(), a.dataType());
 			out.asVec<T>() = (a.asVec<T>().array() * b.asVec<T>().array()).matrix();
 		}
 	}
-	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx) const override {
+	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
+               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
 		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
-		binaryOp(dx, in[1 - wrtIdx], dx);
+        helperMultiply(dx, in[1 - wrtIdx]);
 	}
+private:
+    // more optimized than cWiseMultiply by avoiding unnecessary heap allocations
+    static void helperMultiply(Tensor& inout, const Tensor& other) {
+        if(other.numElements() == 1) {
+            inout.asVec<T>().array() = inout.asVec<T>().array() * other.data<T>()[0];
+        } else if(inout.numElements() == 1) {
+            Tensor scalar = inout;
+            inout.init(other.shape(),other.dataType());
+            inout.asVec<T>().array() = other.asVec<T>().array() * scalar.data<T>()[0];
+        } else {
+            CHECK(inout.hasSameShape(other));
+            inout.asVec<T>().array() = inout.asVec<T>().array() * other.asVec<T>().array();
+        }
+    }
 };
 
 template<typename T>

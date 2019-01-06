@@ -21,7 +21,8 @@ public:
 		auto vecOut = out.asVec<T>();
 		vecOut = vecA - vecB;
 	}
-	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx) const override {
+	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
+               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
 		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
 		if (wrtIdx == 1) {
             dx.asVec<T>().array() = dx.asVec<T>().array() * static_cast<T>(-1);
