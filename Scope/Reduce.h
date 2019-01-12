@@ -20,7 +20,7 @@ public:
     
     void unaryOp(const Tensor& operand, Tensor& out) const override {
         typename TTypes<T,numResultDims>::Tensor tout;
-        reduce(tout, operand.tensor<T,Tensor::MAX_DIMS>(),reduceDims_);
+        reduce(tout, operand.tensorPadRight<T,Tensor::MAX_DIMS>(),reduceDims_);
         TensorShape outShape;
         for(int i = 0; i < tout.NumDimensions; i++) {
             outShape.addDim(tout.dimension(i));

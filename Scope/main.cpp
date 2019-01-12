@@ -141,26 +141,26 @@ int main(void) {
 	auto y = Placeholder(graph, { BATCH_SIZE,O }, DT_DOUBLE);
 
 	auto w1 = Variable(graph, { I,H }, DT_DOUBLE);
-	auto b1 = Variable(graph, { BATCH_SIZE,H }, DT_DOUBLE);
+	auto b1 = Variable(graph, { 1,H }, DT_DOUBLE);
 	auto mult = MatMul(graph, x, w1);
 	auto add = Add(graph, mult, b1);
 	auto h1 = Tanh(graph, add);
 	auto w2 = Variable(graph, { H,O }, DT_DOUBLE);
-	auto b2 = Variable(graph, { BATCH_SIZE,O }, DT_DOUBLE);
+	auto b2 = Variable(graph, { 1,O }, DT_DOUBLE);
 	auto h2 = Tanh(graph,Add(graph, MatMul(graph,h1,w2), b2));
 	auto error = Square(graph, Sub(graph, y, h2));
     auto reduce = ReduceMax<0>(graph,error);
 
 	//auto error = Multiply(graph, sqrDiff, 0.5);
 
-	w1->init(RandomNormal<double>(0, 0.5));
-	w2->init(RandomNormal<double>(0, 0.5));
-//	w1->init<double>({ 0.15,0.25,0.2,0.3 });
-//	w2->init<double>({ 0.4,0.5 });
-	b1->init(RandomNormal<double>(0,0.5));
-	b2->init(RandomNormal<double>(0,0.5));
-//  b1->init<double>({0.35,0.35});
-//  b2->init<double>({0.6});
+//	w1->init(RandomNormal<double>(0, 0.5));
+//	w2->init(RandomNormal<double>(0, 0.5));
+	w1->init<double>({ 0.15,0.25,0.2,0.3 });
+	w2->init<double>({ 0.4,0.5 });
+//	b1->init(RandomNormal<double>(0,0.5));
+//	b2->init(RandomNormal<double>(0,0.5));
+    b1->init<double>({0.35,0.35});
+    b2->init<double>({0.6});
     
     std::vector<Tensor> out;
     Graph::eval({ {x,data},{y,label} }, { reduce }, out);
@@ -203,3 +203,16 @@ int main(void) {
 #endif
 	return 0;
 }
+
+//#include "broadcast.h"
+//
+//int main(void) {
+//    TensorShape from({1,1});
+//    TensorShape to({2,6});
+//    std::array<int,Tensor::MAX_DIMS> multDims;
+//    BCast::compatible(from, to);
+//    BCast::multDimsPadRight(multDims, from, to);
+//    for(int i : multDims) {
+//        cout << i << endl;
+//    }
+//}

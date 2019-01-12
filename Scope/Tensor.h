@@ -91,6 +91,12 @@ public:
 
 	template<typename T, size_t NDIMS>
 	typename MTTypes<T, NDIMS>::Tensor tensor() const;
+    
+	template<typename T, size_t NDIMS>
+	typename MTTypes<T, NDIMS>::Tensor tensorPadRight() const;
+    
+	template<typename T, size_t NDIMS>
+	typename MTTypes<T, NDIMS>::Tensor tensorPadLeft() const;
 
 	template<typename T>
 	typename MTTypes<T>::Matrix matrix() const;
@@ -168,9 +174,22 @@ Eigen::DSizes<Eigen::Index, NDIMS> Tensor::eigenDimsPadRight() const {
 
 template<typename T, size_t NDIMS>
 typename MTTypes<T, NDIMS>::Tensor Tensor::tensor() const {
+    CHECK_EQ(NDIMS,numDims());
+    return tensorPadLeft<T,NDIMS>();
+}
+
+template<typename T, size_t NDIMS>
+typename MTTypes<T, NDIMS>::Tensor Tensor::tensorPadRight() const {
 	CHECK_EQ(DataTypeToEnum<T>::v(), dt_) << "wrong type";
 	return typename MTTypes<T, NDIMS>::Tensor(data<T>(), eigenDimsPadRight<NDIMS>());
 }
+
+template<typename T, size_t NDIMS>
+typename MTTypes<T, NDIMS>::Tensor Tensor::tensorPadLeft() const {
+	CHECK_EQ(DataTypeToEnum<T>::v(), dt_) << "wrong type";
+	return typename MTTypes<T, NDIMS>::Tensor(data<T>(), eigenDimsPadLeft<NDIMS>());
+}
+
 
 template<typename T>
 typename MTTypes<T>::Matrix Tensor::matrix() const { 
