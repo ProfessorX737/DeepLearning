@@ -1,4 +1,5 @@
 #include "TensorShape.h"
+#include "logging.h"
 #include <sstream>
 
 TensorShape::TensorShape(const dim_init_list& dims) {

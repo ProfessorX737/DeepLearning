@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <memory>
 #include <algorithm>
-#include "logging.h"
 #include <stdio.h>
 #if defined(_WIN32) || defined(WIN32)
 #include <malloc.h>
@@ -23,7 +22,7 @@ void Tensor::init(const TensorShape& shape, DataType dt) {
 	shape_ = std::move(shape);
 	dt_ = dt;
 	buffer_ = std::make_shared<TensorBuffer>();
-	dt_size_ = DataTypeSize(dt_);
+    dt_size_ = DataTypeSize::v(dt_);
 	buffer_->allocate(numElements()*dt_size_);
 }
 
@@ -31,7 +30,7 @@ void Tensor::init(const dim_init_list& dims, DataType dt) {
 	shape_.init(dims);
 	dt_ = dt;
 	buffer_ = std::make_shared<TensorBuffer>();
-	dt_size_ = DataTypeSize(dt_);
+    dt_size_ = DataTypeSize::v(dt_);
 	buffer_->allocate(numElements()*dt_size_);
 }
 

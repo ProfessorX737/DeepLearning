@@ -2,7 +2,6 @@
 #include <initializer_list>
 #include <vector>
 #include <Eigen/Dense>
-#include "logging.h"
 #include <string>
 
 class TensorShape {

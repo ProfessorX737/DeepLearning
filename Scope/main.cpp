@@ -1,8 +1,16 @@
+#define USING_DT_FLOAT
+#define USING_DT_DOUBLE
+#define USING_DT_INT32
+
 #include <iostream>
-#include "types.h"
-#include "logging.h"
-#include "Tensor.h"
+#include <vector>
+#include <ctime>
+#include <tuple>
+
+#include "Graph.h"
 #include "Variable.h"
+
+//#include "logging.h"
 #include "MatMul.h"
 #include "Add.h"
 #include "Initializer.h"
@@ -10,13 +18,14 @@
 #include "Tanh.h"
 #include "Square.h"
 #include "Sub.h"
-#include "Graph.h"
 #include "Multiply.h"
-#include <vector>
+
 #include "GradientDescent.h"
 #include "MomentumDescent.h"
 #include "Sigmoid.h"
-#include <ctime>
+#include "Reduce.h"
+
+
 
 using namespace std;
 
@@ -116,13 +125,15 @@ int main(void) {
 	const int I = 2;
 	const int H = 2;
 	const int O = 1;
-	const int BATCH_SIZE = 1;
+	const int BATCH_SIZE = 2;
 
 	// get all our data and store into tensors
 	Tensor data({ BATCH_SIZE,I }, DT_DOUBLE);
 	Tensor label({ BATCH_SIZE,O }, DT_DOUBLE);
-	data.fill<double>({ 1,1 });
-	label.fill<double>({ 0 });
+	data.fill<double>({ 1,1,1,1 });
+	label.fill<double>({ 0,0 });
+//	data.fill<double>({ 1,1 });
+//	label.fill<double>({ 0 });
 
 	Graph graph;
 
@@ -138,6 +149,8 @@ int main(void) {
 	auto b2 = Variable(graph, { BATCH_SIZE,O }, DT_DOUBLE);
 	auto h2 = Tanh(graph,Add(graph, MatMul(graph,h1,w2), b2));
 	auto error = Square(graph, Sub(graph, y, h2));
+    auto reduce = ReduceMax<0>(graph,error);
+
 	//auto error = Multiply(graph, sqrDiff, 0.5);
 
 	w1->init(RandomNormal<double>(0, 0.5));
@@ -148,31 +161,45 @@ int main(void) {
 	b2->init(RandomNormal<double>(0,0.5));
 //  b1->init<double>({0.35,0.35});
 //  b2->init<double>({0.6});
+    
+    std::vector<Tensor> out;
+    Graph::eval({ {x,data},{y,label} }, { reduce }, out);
+    cout << out[0].asVec<double>() << endl;
 
     //auto optimizer = std::make_shared<MomentumDescentOp<double>>(graph,error,0.25f,0.5f);
-    auto optimizer = MomentumDescent(graph, error, 0.2f, 0.5f);
-    
-    std::srand(static_cast<uint>(std::time(NULL)));
-
-    for(int i = 0; i < 5000; i++) {
-        const int d1 = rand() % 2;
-        const int d2 = rand() % 2;
-        const int d3 = d1 ^ d2;
-        data.asVec<double>().data()[0] = static_cast<double>(d1);
-        data.asVec<double>().data()[1] = static_cast<double>(d2);
-        label.asVec<double>().data()[0] = static_cast<double>(d3);
-        std::vector<Tensor> out;
-        Graph::eval({ {x,data},{y,label} }, { h2,optimizer }, out);
-        cout << d1 << " " << d2 << ": " << d3 << endl;
-        cout << "output: " << out[0].asVec<double>() << endl;
-        cout << "error: " << out[1].asVec<double>() << endl << endl;
-    }
+//    auto optimizer = MomentumDescent(graph, error, 0.2f, 0.5f);
+//    
+//    std::srand(static_cast<uint>(std::time(NULL)));
+//
+//    for(int i = 0; i < 2000; i++) {
+//        const int d1 = rand() % 2;
+//        const int d2 = rand() % 2;
+//        const int d3 = d1 ^ d2;
+//        const int d4 = rand() % 2;
+//        const int d5 = rand() % 2;
+//        const int d6 = d4 ^ d5;
+//        data.asVec<double>().data()[0] = static_cast<double>(d1);
+//        data.asVec<double>().data()[1] = static_cast<double>(d2);
+//        label.asVec<double>().data()[0] = static_cast<double>(d3);
+//        
+//        data.asVec<double>().data()[2] = static_cast<double>(d4);
+//        data.asVec<double>().data()[3] = static_cast<double>(d5);
+//        label.asVec<double>().data()[1] = static_cast<double>(d6);
+//        
+//        std::vector<Tensor> out;
+//        Graph::eval({ {x,data},{y,label} }, { h2,optimizer }, out);
+//        cout << d1 << " " << d2 << ": " << d3 << endl;
+//        cout << "output: " << out[0].asVec<double>() << endl;
+//        cout << "error: " << out[1].asVec<double>() << endl << endl;
+//    }
 
 //        std::vector<Tensor> gradients = optimizer->getGradients();
 //        for(int i = 0; i < gradients.size(); i++) {
 //            cout << gradients[i].matrix<float>() << endl << endl;
 //        }
 
+#if defined(_WIN32) || defined(WIN32)
 	cin.get();
+#endif
 	return 0;
 }
