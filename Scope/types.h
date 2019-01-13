@@ -91,12 +91,14 @@ TYPE_AND_ENUM(bool, DT_BOOL);
 //#define CALL_string(m, ...) m(std::string, __VA_ARGS__)
 //#define CALL_bool(m, ...) m(bool, __VA_ARGS__)
 
-#if defined(USING_DT_FLOAT) || defined(USING_ALL_TYPES)
+#define USING_FLOATING_POINT_TYPES
+
+#if defined(USING_DT_FLOAT) || defined(USING_ALL_TYPES) || defined(USING_FLOATING_POINT_TYPES)
 #define CALL_float(m, ...) m(float, __VA_ARGS__)
 #else
 #define CALL_float(m, ...)
 #endif
-#if defined(USING_DT_DOUBLE) || defined(USING_ALL_TYPES)
+#if defined(USING_DT_DOUBLE) || defined(USING_ALL_TYPES) || defined(USING_FLOATING_POINT_TYPES)
 #define CALL_double(m, ...) m(double, __VA_ARGS__)
 #else
 #define CALL_double(m, ...)

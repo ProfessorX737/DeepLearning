@@ -72,3 +72,7 @@ bool BCast::multDimsPadRight(Eigen::array<int,Tensor::MAX_DIMS>& multDims, const
     }
     return true;
 }
+
+bool BCast::multDims(Eigen::array<int,Tensor::MAX_DIMS>& multDims, const TensorShape& from, const TensorShape to) {
+    return multDimsPadLeft(multDims,from,to);
+}

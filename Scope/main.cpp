@@ -1,7 +1,3 @@
-#define USING_DT_FLOAT
-#define USING_DT_DOUBLE
-#define USING_DT_INT32
-
 #include <iostream>
 #include <vector>
 #include <ctime>
