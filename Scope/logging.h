@@ -2,17 +2,15 @@
 #include <string>
 #include <sstream>
 
-#undef ERROR
-
 enum Severity {
 	INFO = 0,
 	WARNING = 1,
-	ERROR = 2,
+	PROBLEM = 2,
 	FATAL = 3,
 	NUM_SEVERITIES = 4
 };
 
-static const char* SeverityNames[NUM_SEVERITIES] = { "INFO","WARNING","ERROR","FATAL" };
+static const char* SeverityNames[NUM_SEVERITIES] = { "INFO","WARNING","PROBLEM","FATAL" };
 
 class LogMessage : public std::ostringstream {
 public:
@@ -35,7 +33,7 @@ public:
 
 #define LOG_INFO LogMessage(INFO,__FILE__,__FUNCTION__,__LINE__).flush()
 #define LOG_WARNING LogMessage(WARNING,__FILE__,__FUNCTION__,__LINE__).flush()
-#define LOG_ERROR LogMessage(ERROR,__FILE__,__FUNCTION__,__LINE__).flush()
+#define LOG_PROBLEM LogMessage(PROBLEM,__FILE__,__FUNCTION__,__LINE__).flush()
 #define LOG_FATAL LogMessageFatal(__FILE__,__FUNCTION__,__LINE__).flush()
 #define LOG(severity) LOG_##severity
 

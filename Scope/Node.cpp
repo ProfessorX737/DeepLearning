@@ -19,7 +19,7 @@ Node::Node(Graph& graph, const std::string& class_name) {
 }
 
 DataType Node::dataType() const {
-    LOG(ERROR) << "dataType() function not implemented in node " << class_name_;
+    LOG(PROBLEM) << "dataType() function not implemented in node " << class_name_;
     return DT_INVALID;
 }
 
