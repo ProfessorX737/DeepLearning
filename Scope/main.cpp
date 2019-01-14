@@ -121,15 +121,17 @@ int main(void) {
 	const int I = 2;
 	const int H = 2;
 	const int O = 1;
-	const int BATCH_SIZE = 2;
+	const int BATCH_SIZE = 1;
 
 	// get all our data and store into tensors
 	Tensor data({ BATCH_SIZE,I }, DT_DOUBLE);
 	Tensor label({ BATCH_SIZE,O }, DT_DOUBLE);
-	data.fill<double>({ 1,1,1,1 });
-	label.fill<double>({ 0,0 });
-//	data.fill<double>({ 1,1 });
-//	label.fill<double>({ 0 });
+//	data.fill<double>({ 1,1,
+//                        1,1 });
+//	label.fill<double>({ 0,
+//                         0 });
+	data.fill<double>({ 1,1 });
+	label.fill<double>({ 0 });
 
 	Graph graph;
 
@@ -138,32 +140,28 @@ int main(void) {
 
 	auto w1 = Variable(graph, { I,H }, DT_DOUBLE);
 	auto b1 = Variable(graph, { 1,H }, DT_DOUBLE);
-	auto mult = MatMul(graph, x, w1);
-	auto add = Add(graph, mult, b1);
-	auto h1 = Tanh(graph, add);
+	auto h1 = Tanh(graph,Add(graph, MatMul(graph,x,w1), b1));
 	auto w2 = Variable(graph, { H,O }, DT_DOUBLE);
 	auto b2 = Variable(graph, { 1,O }, DT_DOUBLE);
 	auto h2 = Tanh(graph,Add(graph, MatMul(graph,h1,w2), b2));
 	auto error = Square(graph, Sub(graph, y, h2));
-    auto reduce = ReduceMax<0>(graph,error);
+    auto reduce = ReduceMean<0>(graph,error);
 
-	//auto error = Multiply(graph, sqrDiff, 0.5);
-
-//	w1->init(RandomNormal<double>(0, 0.5));
-//	w2->init(RandomNormal<double>(0, 0.5));
-	w1->init<double>({ 0.15,0.25,0.2,0.3 });
-	w2->init<double>({ 0.4,0.5 });
-//	b1->init(RandomNormal<double>(0,0.5));
-//	b2->init(RandomNormal<double>(0,0.5));
-    b1->init<double>({0.35,0.35});
-    b2->init<double>({0.6});
+	w1->init(RandomNormal<double>(0, 0.5));
+	w2->init(RandomNormal<double>(0, 0.5));
+//	w1->init<double>({ 0.15,0.25,0.2,0.3 });
+//	w2->init<double>({ 0.4,0.5 });
+	b1->init(RandomNormal<double>(0,0.5));
+	b2->init(RandomNormal<double>(0,0.5));
+//    b1->init<double>({0.35,0.35});
+//    b2->init<double>({0.6});
     
     std::vector<Tensor> out;
     Graph::eval({ {x,data},{y,label} }, { reduce }, out);
     cout << out[0].asVec<double>() << endl;
 
-    //auto optimizer = std::make_shared<MomentumDescentOp<double>>(graph,error,0.25f,0.5f);
-//    auto optimizer = MomentumDescent(graph, error, 0.2f, 0.5f);
+//    //auto optimizer = std::make_shared<MomentumDescentOp<double>>(graph,error,0.25f,0.5f);
+//    auto optimizer = MomentumDescent(graph, reduce, 0.2f, 0.5f);
 //    
 //    std::srand(static_cast<uint>(std::time(NULL)));
 //
@@ -188,7 +186,7 @@ int main(void) {
 //        cout << "output: " << out[0].asVec<double>() << endl;
 //        cout << "error: " << out[1].asVec<double>() << endl << endl;
 //    }
-
+//
 //        std::vector<Tensor> gradients = optimizer->getGradients();
 //        for(int i = 0; i < gradients.size(); i++) {
 //            cout << gradients[i].matrix<float>() << endl << endl;
@@ -199,16 +197,18 @@ int main(void) {
 #endif
 	return 0;
 }
-
+//
 //#include "broadcast.h"
 //
-//int main(void) {
-//    TensorShape from({1,1});
-//    TensorShape to({2,6});
-//    std::array<int,Tensor::MAX_DIMS> multDims;
-//    BCast::compatible(from, to);
-//    BCast::multDimsPadRight(multDims, from, to);
-//    for(int i : multDims) {
-//        cout << i << endl;
+//template<int N1, int N2, int N3, int N4>
+//struct test {
+//    test() {
+//        cout << N1 << " " << N2 << " " << N3 << " " << N4 << endl;
 //    }
+//};
+//
+//int main(void) {
+//    int n1 = 3;
+//    int n2 = 4;
+//    NCN_4(n1, n2, 5,6,(test<N1,N2,N3,N4>()));
 //}

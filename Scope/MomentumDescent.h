@@ -45,8 +45,15 @@ public:
         for(int i = 0; i < newDeltaWeights_.size(); i++) {
             oldDeltaWeights_.push_back(newDeltaWeights_[i]);
         }
+        for(int i = 0; i < nvars; i++) {
+            std::cout << variables[i].dimString() << std::endl;
+        }
+        std::cout << std::endl;
+        for(int i = 0; i < nvars; i++) {
+            std::cout << gradients[i].dimString() << std::endl;
+        }
 		for (int i = 0; i < nvars; i++) {
-    		CHECK(variables[i].shape().isSameShape(gradients[i].shape())) << "Variable and gradient should have the same shape: " << variables[i].dimString() << " vs " << gradients[i].dimString();
+    		CHECK(variables[i].hasSameShape(gradients[i])) << "Variable and gradient should have the same shape: " << variables[i].dimString() << " vs " << gradients[i].dimString();
             variables[i].asVec<T>().array() = variables[i].asVec<T>().array() - (newDeltaWeights_[i].template asVec<T>().array() * static_cast<T>(learningRate_));
 		}
 	}

@@ -34,6 +34,7 @@ private:
 	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
                const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
 		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
+
 	}
 };
 

@@ -174,7 +174,6 @@ Eigen::DSizes<Eigen::Index, NDIMS> Tensor::eigenDimsPadRight() const {
 
 template<typename T, size_t NDIMS>
 typename MTTypes<T, NDIMS>::Tensor Tensor::tensor() const {
-    CHECK_EQ(NDIMS,numDims());
     return tensorPadLeft<T,NDIMS>();
 }
 

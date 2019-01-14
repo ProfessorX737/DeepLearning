@@ -244,6 +244,7 @@ case CONSTEXPR_NUM: {                                     \
 
 #define NUMBER_CASES_NESTED(NESTNUM,NUM,STMT)           \
 switch (NUM) {                                      \
+NUM_SWITCH_CASE(NESTNUM,0,STMT)                     \
 NUM_SWITCH_CASE(NESTNUM,1,STMT)                     \
 NUM_SWITCH_CASE(NESTNUM,2,STMT)                     \
 NUM_SWITCH_CASE(NESTNUM,3,STMT)                     \
@@ -257,7 +258,28 @@ default:                                            \
     LOG(FATAL) << NUM << " is not a hardcoded number type case"; \
 }
 
-#define NUMBER_CASES(NUM,STMT) NUMBER_CASES_NESTED(,NUM,STMT)
+//#define NUMBER_CASES(NUM,STMT) NUMBER_CASES_NESTED(,NUM,STMT)
+#define NCN(NESTNUM,NUM,STMT) NUMBER_CASES_NESTED(NESTNUM,NUM,STMT)
+
+#define NCN_1(N1,STMT) NCN(1,N1,STMT)
+#define NCN_2(N1,N2,STMT) NCN_1(N1,NCN(2,N2,STMT))
+#define NCN_3(N1,N2,N3,STMT) NCN_2(N1,N2,NCN(3,N3,STMT))
+#define NCN_4(N1,N2,N3,N4,STMT) NCN_3(N1,N2,N3,NCN(4,N4,STMT))
+#define NCN_5(N1,N2,N3,N4,N5,STMT) NCN_4(N1,N2,N3,N4,NCN(5,N5,STMT))
+#define NCN_6(N1,N2,N3,N4,N5,N6,STMT) NCN_5(N1,N2,N3,N4,N5,NCN(6,N6,STMT))
+#define NCN_7(N1,N2,N3,N4,N5,N6,N7,STMT) NCN_6(N1,N2,N3,N4,N5,N6,NCN(7,N7,STMT))
+#define NCN_8(N1,N2,N3,N4,N5,N6,N7,N8,STMT) NCN_7(N1,N2,N3,N4,N5,N6,N7,NCN(8,N8,STMT))
+#define NCN_9(N1,N2,N3,N4,N5,N6,N7,N8,N9,STMT) NCN_8(N1,N2,N3,N4,N5,N6,N7,N8,NCN(9,N9,STMT))
+
+//#define NUMBER_CASES(NUM,STMT) \
+//int digits = 0; \
+//if(number < 0) digits = 1; \
+//while(number) { \
+//    number /= 10; \
+//    digits++; \
+//} \
+
+
 
 
 #endif // TYPES_H
