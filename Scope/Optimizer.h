@@ -33,7 +33,7 @@ public:
 		updateVariables(variables_, gradients_);
     }
 
-	virtual void updateVariables(std::vector<Tensor>& variables, const std::vector<Tensor>& gradients) = 0;
+	virtual void updateVariables(std::vector<Tensor>& variables, std::vector<Tensor>& gradients) = 0;
     
     std::vector<Tensor>& getGradients() {
         return gradients_;

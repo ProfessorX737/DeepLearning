@@ -278,7 +278,19 @@ default:                                            \
 //    number /= 10; \
 //    digits++; \
 //} \
-
+        
+//#define ARRAY_TYPEDEF(T,N) \
+//    typedef typename std::array<T,N> Array##T
+        
+//#define ARRAY_TYPEDEF(TO_BE_TYPEDEFED,T,N) \
+//    typedef typename TO_BE_TYPEDEFED Array##N
+//        
+//#define ARRAY_TYPES_REC(T,N) ARRAY_TYPES(T,N)
+//        
+//#define ARRAY_TYPES(T,N) \
+//typedef typename std::array<T,N> Array##N; \
+//ARRAY_TYPES_REC(T,N-1)
+        
 
 
 

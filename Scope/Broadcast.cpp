@@ -25,7 +25,7 @@ bool BCast::compatible(const TensorShape& from, const TensorShape& to) {
     return true;
 }
 // returns true if shape 'from' can be broadcasted to same shape as 'to'
-bool BCast::multDimsPadLeft(Eigen::array<int,Tensor::MAX_DIMS>& multDims, const TensorShape& from, const TensorShape to) {
+bool BCast::multDimsPadLeft(Eigen::array<int,Tensor::MAX_DIMS>& multDims, const TensorShape& from, const TensorShape& to) {
     if(from.numDims() > to.numDims()) return false;
     DCHECK_LE(from.numDims(),Tensor::MAX_DIMS);
     DCHECK_LE(to.numDims(),Tensor::MAX_DIMS);
@@ -50,7 +50,7 @@ bool BCast::multDimsPadLeft(Eigen::array<int,Tensor::MAX_DIMS>& multDims, const 
 }
 
 // returns true if shape 'from' can be broadcasted to same shape as 'to'
-bool BCast::multDimsPadRight(Eigen::array<int,Tensor::MAX_DIMS>& multDims, const TensorShape& from, const TensorShape to) {
+bool BCast::multDimsPadRight(Eigen::array<int,Tensor::MAX_DIMS>& multDims, const TensorShape& from, const TensorShape& to) {
     if(from.numDims() > to.numDims()) return false;
     DCHECK_LE(from.numDims(),Tensor::MAX_DIMS);
     DCHECK_LE(to.numDims(),Tensor::MAX_DIMS);
@@ -73,6 +73,17 @@ bool BCast::multDimsPadRight(Eigen::array<int,Tensor::MAX_DIMS>& multDims, const
     return true;
 }
 
-bool BCast::multDims(Eigen::array<int,Tensor::MAX_DIMS>& multDims, const TensorShape& from, const TensorShape to) {
+bool BCast::multDims(Eigen::array<int,Tensor::MAX_DIMS>& multDims, const TensorShape& from, const TensorShape& to) {
     return multDimsPadLeft(multDims,from,to);
+}
+
+bool BCast::reduceDims(std::vector<int>& reductionIndicies, const TensorShape& from, const TensorShape& to) {
+    Eigen::array<int,Tensor::MAX_DIMS> multDims;
+    if(!multDimsPadRight(multDims, from, to)) return false;
+    for(int i = 0; i < multDims.size(); i++) {
+        if(multDims[i] > 1) {
+            reductionIndicies.push_back(i);
+        }
+    }
+    return true;
 }

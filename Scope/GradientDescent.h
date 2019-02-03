@@ -7,7 +7,7 @@ public:
 	GradientDescentOp(Graph& graph, NodePtr minimize, const float learningRate)
 		: OptimizerOp<T>(graph,minimize), learningRate_(learningRate) {
 	}
-    void updateVariables(std::vector<Tensor>& variables, const std::vector<Tensor>& gradients) override {
+    void updateVariables(std::vector<Tensor>& variables, std::vector<Tensor>& gradients) override {
 		int nvars = static_cast<int>(variables.size());
 		CHECK_EQ(nvars, gradients.size());
 		for (int i = 0; i < nvars; i++) {

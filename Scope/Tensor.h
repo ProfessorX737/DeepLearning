@@ -88,6 +88,15 @@ public:
     
 	template<size_t NDIMS>
 	Eigen::DSizes<Dim, NDIMS> eigenDimsPadRight() const;
+    
+    template<size_t NDIMS>
+    static Eigen::DSizes<Dim,NDIMS> eigenDimsPadLeft(Eigen::DSizes<Dim,NDIMS> rawDims);
+    
+    template<size_t FROM_DIMS, size_t TO_DIMS>
+    static Eigen::DSizes<Eigen::Index,TO_DIMS> eigenDimsPadRight(Eigen::DSizes<Eigen::Index,FROM_DIMS> rawDims);
+        
+    template<size_t FROM_DIMS, size_t TO_DIMS>
+    static Eigen::DSizes<Eigen::Index,TO_DIMS> eigenDimsPadLeft(Eigen::DSizes<Eigen::Index,FROM_DIMS> rawDims);
 
 	template<typename T, size_t NDIMS>
 	typename MTTypes<T, NDIMS>::Tensor tensor() const;
@@ -97,6 +106,12 @@ public:
     
 	template<typename T, size_t NDIMS>
 	typename MTTypes<T, NDIMS>::Tensor tensorPadLeft() const;
+    
+	template<typename T, size_t FROM_DIMS, size_t TO_DIMS>
+    static typename MTTypes<T, TO_DIMS>::Tensor tensorPadRight(typename TTypes<T,FROM_DIMS>::Tensor& in);
+    
+	template<typename T, size_t FROM_DIMS, size_t TO_DIMS>
+    static typename MTTypes<T, TO_DIMS>::Tensor tensorPadLeft(typename TTypes<T,FROM_DIMS>::Tensor& in);
 
 	template<typename T>
 	typename MTTypes<T>::Matrix matrix() const;
@@ -172,6 +187,37 @@ Eigen::DSizes<Eigen::Index, NDIMS> Tensor::eigenDimsPadRight() const {
 	return edims;
 }
 
+template<size_t FROM_DIMS, size_t TO_DIMS>
+Eigen::DSizes<Eigen::Index,TO_DIMS> Tensor::eigenDimsPadLeft(Eigen::DSizes<Eigen::Index,FROM_DIMS> rawDims) {
+    CHECK_GT(TO_DIMS,FROM_DIMS) << " Asking for " << TO_DIMS
+        << " dim tensor from " << FROM_DIMS << " dim tensor";
+	Eigen::DSizes<Eigen::Index, TO_DIMS> paddedDims;
+    int paddingEnd = TO_DIMS - FROM_DIMS;
+    int dimIndex = 0;
+	for (int i = paddingEnd; i < TO_DIMS; i++) {
+		paddedDims[i] = rawDims[dimIndex];
+        dimIndex++;
+	}
+    for(int i = 0; i < paddingEnd; i++) {
+        paddedDims[i] = 1;
+    }
+	return paddedDims;
+}
+
+template<size_t FROM_DIMS, size_t TO_DIMS>
+Eigen::DSizes<Eigen::Index,TO_DIMS> Tensor::eigenDimsPadRight(Eigen::DSizes<Eigen::Index,FROM_DIMS> rawDims) {
+    CHECK_GT(TO_DIMS,FROM_DIMS) << " Asking for " << TO_DIMS
+        << " dim tensor from " << FROM_DIMS << " dim tensor";
+    Eigen::DSizes<Eigen::Index,TO_DIMS> paddedDims;
+    for(int i = 0; i < FROM_DIMS; i++) {
+        paddedDims[i] = rawDims[i];
+    }
+    for(int i = rawDims.size(); i < TO_DIMS; i++) {
+        paddedDims[i] = 1;
+    }
+    return paddedDims;
+}
+
 template<typename T, size_t NDIMS>
 typename MTTypes<T, NDIMS>::Tensor Tensor::tensor() const {
     return tensorPadLeft<T,NDIMS>();
@@ -189,6 +235,17 @@ typename MTTypes<T, NDIMS>::Tensor Tensor::tensorPadLeft() const {
 	return typename MTTypes<T, NDIMS>::Tensor(data<T>(), eigenDimsPadLeft<NDIMS>());
 }
 
+template<typename T, size_t FROM_DIMS, size_t TO_DIMS>
+typename MTTypes<T, TO_DIMS>::Tensor Tensor::tensorPadRight(typename TTypes<T,FROM_DIMS>::Tensor& in) {
+    CHECK_GT(TO_DIMS,FROM_DIMS) << "num output dims should be greater than num intput dims";
+    return typename MTTypes<T,TO_DIMS>::Tensor(in.data(),eigenDimsPadRight<FROM_DIMS,TO_DIMS>(in.dimensions()));
+}
+
+template<typename T, size_t FROM_DIMS, size_t TO_DIMS>
+typename MTTypes<T, TO_DIMS>::Tensor Tensor::tensorPadLeft(typename TTypes<T,FROM_DIMS>::Tensor& in) {
+    CHECK_GT(TO_DIMS,FROM_DIMS) << "num output dims should be greater than num intput dims";
+    return typename MTTypes<T,TO_DIMS>::Tensor(in.data(),eigenDimsPadLeft<FROM_DIMS,TO_DIMS>(in.dimensions()));
+}
 
 template<typename T>
 typename MTTypes<T>::Matrix Tensor::matrix() const { 
