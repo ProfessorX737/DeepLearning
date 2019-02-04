@@ -3,9 +3,9 @@
 #include "UnaryOp.h"
 
 template<typename T>
-class SquareOp : public UnaryOp {
+class SquareOp : public UnaryOp<T> {
 public:
-	SquareOp(Graph& graph, NodePtr& in) : UnaryOp(graph, in, "Square") {}
+	SquareOp(Graph& graph, NodePtr& in) : UnaryOp<T>(graph, in, "Square") {}
     
 	void unaryOp(const Tensor& in, Tensor& out) const override {
 		TensorShape outShape = in.shape();
@@ -13,13 +13,17 @@ public:
 		auto outVec = out.asVec<T>();
 		outVec = in.asVec<T>().array().square().matrix();
 	}
-    
-	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx,
-               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
-		DCHECK_EQ(wrtIdx, 0);
-        CHECK(dx.hasSameShape(in[0])) << dx.dimString() << " vs " << in[0].dimString();
-        dx.asVec<T>().array() = dx.asVec<T>().array() * (static_cast<T>(2) * in[0].asVec<T>().array());
-	}
+    void deriv(Tensor& dx, DerivContext<1>& ctx) const override {
+		DCHECK_EQ(ctx.wrtIdx, 0);
+        CHECK(dx.hasSameShape(ctx.operands[0])) << dx.dimString() << " vs " << ctx.operands[0].dimString();
+        dx.asVec<T>().array() = dx.asVec<T>().array() * (static_cast<T>(2) * ctx.operands[0].asVec<T>().array());
+    }
+//	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx,
+//               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
+//		DCHECK_EQ(wrtIdx, 0);
+//        CHECK(dx.hasSameShape(in[0])) << dx.dimString() << " vs " << in[0].dimString();
+//        dx.asVec<T>().array() = dx.asVec<T>().array() * (static_cast<T>(2) * in[0].asVec<T>().array());
+//	}
 };
 
 inline NodePtr Square(Graph& graph, NodePtr in) {

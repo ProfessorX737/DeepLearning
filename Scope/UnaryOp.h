@@ -1,9 +1,10 @@
 #pragma once
 #include "Op.h"
 
-class UnaryOp : public Op<1> {
+template<typename T>
+class UnaryOp : public Op<T,1> {
 public:
-	UnaryOp(Graph& graph, NodePtr& operand, const std::string& class_name) : Op(graph, { {operand} }, class_name) {
+	UnaryOp(Graph& graph, NodePtr& operand, const std::string& class_name) : Op<T,1>(graph, { {operand} }, class_name) {
 	}
 private:
 	virtual void unaryOp(const Tensor& operand, Tensor& out) const = 0;

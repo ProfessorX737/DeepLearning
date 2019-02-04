@@ -2,13 +2,13 @@
 #include "BinaryOp.h"
 
 template<typename T>
-class MatMulOp : public BinaryOp {
+class MatMulOp : public BinaryOp<T> {
 public:
 	MatMulOp(Graph& graph, NodePtr& a, NodePtr& b) 
-		: BinaryOp(graph, a, b, "MatMul"), transA_(0), transB_(0) {}
+		: BinaryOp<T>(graph, a, b, "MatMul"), transA_(0), transB_(0) {}
 
 	MatMulOp(Graph& graph, NodePtr& a, NodePtr& b, bool transA, bool transB)
-		: BinaryOp(graph, a, b, "MatMul"), transA_(transA), transB_(transB) {}
+		: BinaryOp<T>(graph, a, b, "MatMul"), transA_(transA), transB_(transB) {}
 
 	using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 	using ConstMatrixMap = Eigen::Map<const Matrix>;
@@ -110,16 +110,25 @@ public:
 			matmult(a, b, out, transA, transB);
 		}
 	}
-	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
-               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
-		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
-		if (wrtIdx == 0) {
-			matmult(dx, in[1 - wrtIdx], dx, false, true);
+    void deriv(Tensor& dx, DerivContext<2>& ctx) const override {
+		DCHECK(((ctx.wrtIdx == 0) || (ctx.wrtIdx == 1)));
+		if (ctx.wrtIdx == 0) {
+			matmult(dx, ctx.operands[1 - ctx.wrtIdx], dx, false, true);
 		}
 		else {
-			matmult(in[1 - wrtIdx], dx, dx, true, false);
+			matmult(ctx.operands[1 - ctx.wrtIdx], dx, dx, true, false);
 		}
-	}
+    }
+//	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
+//               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
+//		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
+//		if (wrtIdx == 0) {
+//			matmult(dx, in[1 - wrtIdx], dx, false, true);
+//		}
+//		else {
+//			matmult(in[1 - wrtIdx], dx, dx, true, false);
+//		}
+//	}
 
 	bool transA_;
 	bool transB_;

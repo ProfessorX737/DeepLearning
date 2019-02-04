@@ -3,9 +3,9 @@
 #include "Broadcast.h"
 
 template<typename T>
-class AddOp : public BinaryOp {
+class AddOp : public BinaryOp<T> {
 public:
-	AddOp(Graph& graph, NodePtr& a, NodePtr& b) : BinaryOp(graph, a, b, "Add") {}
+	AddOp(Graph& graph, NodePtr& a, NodePtr& b) : BinaryOp<T>(graph, a, b, "Add") {}
 	~AddOp() {}
 private:
 	void binaryOp(const Tensor& a, const Tensor& b, Tensor& out) const override {
@@ -31,11 +31,15 @@ private:
             out.tensorPadLeft<T,Tensor::MAX_DIMS>() = A + B;
         }
 	}
-	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
-               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
-		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
+    void deriv(Tensor& dx, DerivContext<2>& ctx) const override {
+		DCHECK(((ctx.wrtIdx == 0) || (ctx.wrtIdx == 1)));
         
-	}
+    }
+//	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
+//               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
+//		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
+//        
+//	}
 };
 
 inline NodePtr Add(Graph& graph, NodePtr a, NodePtr b) {

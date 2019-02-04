@@ -4,25 +4,36 @@
 #include "Tensor.h"
 #include <iostream>
 
-template<int NINPUT>
+template<int NOPERANDS>
+struct DerivContext {
+    DerivContext(const std::array<Tensor,NOPERANDS>& operands, int wrtIdx,
+                 const std::unordered_map<int,Tensor>& nodeTensorMap)
+    : operands(operands), wrtIdx(wrtIdx), nodeTensorMap(nodeTensorMap) {}
+    
+    const std::array<Tensor,NOPERANDS>& operands;
+    int wrtIdx;
+    const std::unordered_map<int,Tensor>& nodeTensorMap;
+};
+
+template<typename T,int NOPERANDS>
 class Op : public Node {
 public:
-	Op(Graph& graph, const std::array<NodePtr,NINPUT>& operands, const std::string& class_name) : Node(graph, class_name) {
-		for (int i = 0; i < NINPUT; i++) {
+	Op(Graph& graph, const std::array<NodePtr,NOPERANDS>& operands, const std::string& class_name) : Node(graph, class_name) {
+		for (int i = 0; i < NOPERANDS; i++) {
 			children_.push_back(std::move(operands[i]));
 		}
 	}
 	void eval(Tensor& out) override {
-		std::array<Tensor, NINPUT> in;
-		for (int i = 0; i < NINPUT; i++) {
+		std::array<Tensor, NOPERANDS> in;
+		for (int i = 0; i < NOPERANDS; i++) {
 			children_[i]->eval(in[i]);
 		}
 		op(in,out);
 	}
 	void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) override {
 
-		std::array<Tensor, NINPUT> in;
-		for (int i = 0; i < NINPUT; i++) {
+		std::array<Tensor, NOPERANDS> in;
+		for (int i = 0; i < NOPERANDS; i++) {
 			if (children_[i]->numChildren() == 0) {
 				children_[i]->eval(nodeTensorMap, in[i]);
 			}
@@ -40,15 +51,16 @@ public:
 		op(in,out);
 	}
 	DataType dataType() const override {
-		return (NINPUT == 0) ? DT_INVALID : children_[0]->dataType();
+		return (NOPERANDS == 0) ? DT_INVALID : children_[0]->dataType();
 	}
 
     void evalDeriv(Tensor& dx, std::unordered_map<int,Tensor>& nodeTensorMap,
                            const std::vector<int>& path, const int pathIndex) const override {
         
-        std::array<Tensor, NINPUT> in;
+        std::array<Tensor, NOPERANDS> in;
+        std::array<typename TTypes<T,Tensor::MAX_DIMS>::Tensor, NOPERANDS> in2;
         
-		for (int i = 0; i < NINPUT; i++) {
+		for (int i = 0; i < NOPERANDS; i++) {
 			if (children_[i]->numChildren() == 0) {
 				children_[i]->eval(nodeTensorMap, in[i]);
 			}
@@ -62,14 +74,16 @@ public:
 				}
 			}
 		}
-        
         int wrtIdx = path[pathIndex];
-        deriv(dx, in, wrtIdx, nodeTensorMap);
+        DerivContext<NOPERANDS> ctx(in,wrtIdx,nodeTensorMap);
+        //deriv(dx, in, wrtIdx, nodeTensorMap);
+        deriv(dx,ctx);
         children_[wrtIdx]->evalDeriv(dx, nodeTensorMap, path, pathIndex+1);
     }
 
 private:
-	virtual void op(const std::array<Tensor,NINPUT>& in, Tensor& out) const = 0;
-    virtual void deriv(Tensor& dx, const std::array<Tensor, NINPUT>& in, int wrtIdx,
-                       const std::unordered_map<int,Tensor>& nodeTensorMap) const = 0;
+	virtual void op(const std::array<Tensor,NOPERANDS>& in, Tensor& out) const = 0;
+//    virtual void deriv(Tensor& dx, const std::array<Tensor, NOPERANDS>& in, int wrtIdx,
+//                       const std::unordered_map<int,Tensor>& nodeTensorMap) const = 0;
+    virtual void deriv(Tensor& dx, DerivContext<NOPERANDS>& ctx) const = 0;
 };

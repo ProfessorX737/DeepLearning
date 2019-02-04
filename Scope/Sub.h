@@ -2,9 +2,9 @@
 #include "BinaryOp.h"
 
 template<typename T>
-class SubOp : public BinaryOp {
+class SubOp : public BinaryOp<T> {
 public:
-	SubOp(Graph& graph, NodePtr& a, NodePtr& b) : BinaryOp(graph, a, b, "Sub") {}
+	SubOp(Graph& graph, NodePtr& a, NodePtr& b) : BinaryOp<T>(graph, a, b, "Sub") {}
 	void binaryOp(const Tensor& a, const Tensor& b, Tensor& out) const override {
 		subtract(a, b, out);
 	}
@@ -31,13 +31,19 @@ public:
             out.tensorPadLeft<T,Tensor::MAX_DIMS>() = A - B;
         }
 	}
-	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
-               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
-		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
-		if (wrtIdx == 1) {
+    void deriv(Tensor& dx, DerivContext<2>& ctx) const override {
+		DCHECK(((ctx.wrtIdx == 0) || (ctx.wrtIdx == 1)));
+		if (ctx.wrtIdx == 1) {
             dx.asVec<T>().array() = dx.asVec<T>().array() * static_cast<T>(-1);
 		}
-	}
+    }
+//	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
+//               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
+//		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
+//		if (wrtIdx == 1) {
+//            dx.asVec<T>().array() = dx.asVec<T>().array() * static_cast<T>(-1);
+//		}
+//	}
 	
 };
 

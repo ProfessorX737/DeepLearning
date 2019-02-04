@@ -10,23 +10,32 @@
 #include "UnaryOp.h"
 
 template<typename T>
-class SigmoidOp : public UnaryOp {
+class SigmoidOp : public UnaryOp<T> {
 public:
-    SigmoidOp(Graph& graph, NodePtr operand) : UnaryOp(graph,operand,"Sigmoid") {}
+    SigmoidOp(Graph& graph, NodePtr operand) : UnaryOp<T>(graph,operand,"Sigmoid") {}
     void unaryOp(const Tensor& operand, Tensor& out) const override {
         out.init(operand.shape(),operand.dataType());
         out.asVec<T>().array() = 1/(1 + (operand.asVec<T>().array() * static_cast<T>(-1)).exp());
     }
-	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx,
-               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
-		CHECK_EQ(wrtIdx, 0);
-		auto it = nodeTensorMap.find(getId());
-		if (it == nodeTensorMap.end()) {
+    void deriv(Tensor& dx, DerivContext<1>& ctx) const override {
+		CHECK_EQ(ctx.wrtIdx, 0);
+        auto it = ctx.nodeTensorMap.find(UnaryOp<T>::getId());
+		if (it == ctx.nodeTensorMap.end()) {
             LOG(FATAL) << "operand for derivative cannot be found in nodeTensorMap";
 		}
         Tensor sig = it->second;
         dx.asVec<T>().array() = dx.asVec<T>().array () * (sig.asVec<T>().array() * (1 - sig.asVec<T>().array()));
-	}
+    }
+//	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx,
+//               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
+//		CHECK_EQ(wrtIdx, 0);
+//        auto it = nodeTensorMap.find(UnaryOp<T>::getId());
+//		if (it == nodeTensorMap.end()) {
+//            LOG(FATAL) << "operand for derivative cannot be found in nodeTensorMap";
+//		}
+//        Tensor sig = it->second;
+//        dx.asVec<T>().array() = dx.asVec<T>().array () * (sig.asVec<T>().array() * (1 - sig.asVec<T>().array()));
+//	}
 };
 
 inline NodePtr Sigmoid(Graph& graph, NodePtr operand) {

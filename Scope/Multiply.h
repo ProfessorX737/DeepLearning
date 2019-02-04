@@ -11,10 +11,10 @@
 #include "BinaryOp.h"
 
 template<typename T>
-class ScalarMultiplyOp : public UnaryOp {
+class ScalarMultiplyOp : public UnaryOp<T> {
 public:
 	ScalarMultiplyOp(Graph& graph, NodePtr& operand, T scalar)
-    : UnaryOp(graph, operand, "MultiplyOp"), scalar_(scalar) {}
+    : UnaryOp<T>(graph, operand, "MultiplyOp"), scalar_(scalar) {}
     
 	void unaryOp(const Tensor& in, Tensor& out) const override {
 		scalarMultiply(in, scalar_, out);
@@ -33,10 +33,10 @@ private:
 };
 
 template<typename T>
-class CWiseMultiplyOp : public BinaryOp {
+class CWiseMultiplyOp : public BinaryOp<T> {
 public:
 	CWiseMultiplyOp(Graph& graph, NodePtr& a, NodePtr& b)
-		: BinaryOp(graph, a, b, "CWiseMultiply") {}
+		: BinaryOp<T>(graph, a, b, "CWiseMultiply") {}
 
 	// allows broadcasting for scalars only
 	void binaryOp(const Tensor& a, const Tensor& b, Tensor& out) const override {
@@ -58,11 +58,15 @@ public:
 			out.asVec<T>() = (a.asVec<T>().array() * b.asVec<T>().array()).matrix();
 		}
 	}
-	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
-               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
-		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
-        helperMultiply(dx, in[1 - wrtIdx]);
-	}
+    void deriv(Tensor& dx, DerivContext<2>& ctx) const override {
+		DCHECK(((ctx.wrtIdx == 0) || (ctx.wrtIdx == 1)));
+        helperMultiply(dx, ctx.operands[1 - ctx.wrtIdx]);
+    }
+//	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
+//               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
+//		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
+//        helperMultiply(dx, in[1 - wrtIdx]);
+//	}
 private:
     // more optimized than cWiseMultiply by avoiding unnecessary heap allocations
     static void helperMultiply(Tensor& inout, const Tensor& other) {

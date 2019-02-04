@@ -2,9 +2,10 @@
 #include "Op.h"
 #include <string>
 
-class BinaryOp : public Op<2> {
+template<typename T>
+class BinaryOp : public Op<T,2> {
 public:
-	BinaryOp(Graph& graph, NodePtr& left, NodePtr& right, const std::string& class_name) : Op(graph, { {left, right} }, class_name) {
+	BinaryOp(Graph& graph, NodePtr& left, NodePtr& right, const std::string& class_name) : Op<T,2>(graph, { {left, right} }, class_name) {
 	}
 private:
 	virtual void binaryOp(const Tensor& left, const Tensor& right, Tensor& out) const = 0;
