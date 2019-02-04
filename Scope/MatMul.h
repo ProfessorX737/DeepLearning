@@ -119,16 +119,6 @@ public:
 			matmult(ctx.operands[1 - ctx.wrtIdx], dx, dx, true, false);
 		}
     }
-//	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
-//               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
-//		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
-//		if (wrtIdx == 0) {
-//			matmult(dx, in[1 - wrtIdx], dx, false, true);
-//		}
-//		else {
-//			matmult(in[1 - wrtIdx], dx, dx, true, false);
-//		}
-//	}
 
 	bool transA_;
 	bool transB_;

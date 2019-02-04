@@ -23,19 +23,10 @@ public:
 		if (it == ctx.nodeTensorMap.end()) {
             LOG(FATAL) << "operand for derivative cannot be found in nodeTensorMap";
 		}
-        Tensor sig = it->second;
-        dx.asVec<T>().array() = dx.asVec<T>().array () * (sig.asVec<T>().array() * (1 - sig.asVec<T>().array()));
+        Tensor sig;
+        sig.sharedCopyInit<T>(it->second,ctx.batchIndex);
+        dx.asVec<T>().array() = dx.asVec<T>().array() * (sig.asVec<T>().array() * (1 - sig.asVec<T>().array()));
     }
-//	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx,
-//               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
-//		CHECK_EQ(wrtIdx, 0);
-//        auto it = nodeTensorMap.find(UnaryOp<T>::getId());
-//		if (it == nodeTensorMap.end()) {
-//            LOG(FATAL) << "operand for derivative cannot be found in nodeTensorMap";
-//		}
-//        Tensor sig = it->second;
-//        dx.asVec<T>().array() = dx.asVec<T>().array () * (sig.asVec<T>().array() * (1 - sig.asVec<T>().array()));
-//	}
 };
 
 inline NodePtr Sigmoid(Graph& graph, NodePtr operand) {

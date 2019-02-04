@@ -62,11 +62,12 @@ void Tensor::TensorBuffer::allocate(size_t num_bytes) {
 	if (posix_memalign(&data, ALIGNMENT, num_bytes)) data = nullptr;
 #endif
 	CHECK_NOT_NULL(data) << "Failed to allocate " << num_bytes << " bytes";
+    ownsData = true;
 }
 
 void Tensor::TensorBuffer::free()
 {
-	if (data == nullptr) return;
+	if (data == nullptr || ownsData == false) return;
 #if defined(_WIN32) || defined(WIN32)
 	_aligned_free(data);
 #else

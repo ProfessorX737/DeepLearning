@@ -24,10 +24,10 @@ public:
         out.init(in.shape(),in.dataType());
         out.asVec<T>() = (in.asVec<T>().array() * scalar).matrix();
 	}
-    void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx,
-               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
+    void deriv(Tensor& dx, DerivContext<1>& ctx) const override {
 		dx.asVec<T>() = (dx.asVec<T>().array() * scalar_).matrix();
-	}
+    }
+
 private:
     T scalar_;
 };
@@ -62,11 +62,6 @@ public:
 		DCHECK(((ctx.wrtIdx == 0) || (ctx.wrtIdx == 1)));
         helperMultiply(dx, ctx.operands[1 - ctx.wrtIdx]);
     }
-//	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
-//               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
-//		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
-//        helperMultiply(dx, in[1 - wrtIdx]);
-//	}
 private:
     // more optimized than cWiseMultiply by avoiding unnecessary heap allocations
     static void helperMultiply(Tensor& inout, const Tensor& other) {

@@ -38,16 +38,6 @@ public:
             dx.tensor<T,Tensor::MAX_DIMS>() = oldDx.broadcast(multDims);
         }
     }
-//	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx,
-//               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
-//        if(!dx.hasSameShape(in[0])) {
-//            Eigen::array<int,Tensor::MAX_DIMS> multDims;
-//            CHECK(BCast::multDims(multDims, dx.shape(), in[0].shape())) << "derivative cannot be broadcasted to input shape for Reduce Op deriv: " << dx.dimString() << " vs " << in[0].dimString();
-//            auto oldDx = dx.tensor<T,Tensor::MAX_DIMS>();
-//            dx.init(in[0].shape(),in[0].dataType());
-//            dx.tensor<T,Tensor::MAX_DIMS>() = oldDx.broadcast(multDims);
-//        }
-//	}
 private:
     Eigen::array<int,sizeof...(Reduce)> reduceDims_;
 };

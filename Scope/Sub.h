@@ -37,14 +37,7 @@ public:
             dx.asVec<T>().array() = dx.asVec<T>().array() * static_cast<T>(-1);
 		}
     }
-//	void deriv(Tensor& dx, const std::array<Tensor, 2>& in, int wrtIdx,
-//               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
-//		DCHECK(((wrtIdx == 0) || (wrtIdx == 1)));
-//		if (wrtIdx == 1) {
-//            dx.asVec<T>().array() = dx.asVec<T>().array() * static_cast<T>(-1);
-//		}
-//	}
-	
+
 };
 
 inline NodePtr Sub(Graph& graph, NodePtr a, NodePtr b) {

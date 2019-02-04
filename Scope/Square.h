@@ -18,12 +18,6 @@ public:
         CHECK(dx.hasSameShape(ctx.operands[0])) << dx.dimString() << " vs " << ctx.operands[0].dimString();
         dx.asVec<T>().array() = dx.asVec<T>().array() * (static_cast<T>(2) * ctx.operands[0].asVec<T>().array());
     }
-//	void deriv(Tensor& dx, const std::array<Tensor, 1>& in, int wrtIdx,
-//               const std::unordered_map<int,Tensor>& nodeTensorMap) const override {
-//		DCHECK_EQ(wrtIdx, 0);
-//        CHECK(dx.hasSameShape(in[0])) << dx.dimString() << " vs " << in[0].dimString();
-//        dx.asVec<T>().array() = dx.asVec<T>().array() * (static_cast<T>(2) * in[0].asVec<T>().array());
-//	}
 };
 
 inline NodePtr Square(Graph& graph, NodePtr in) {

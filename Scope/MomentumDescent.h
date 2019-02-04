@@ -17,9 +17,24 @@ public:
 	}
 
 	// requires: variables.size() == gradients.size()
-	void updateVariables(std::vector<Tensor>& variables, std::vector<Tensor>& gradients) override {
+    void updateVariables(std::vector<Tensor>& variables, std::vector<std::vector<Tensor>>& batchGradients) override {
+        std::vector<Tensor> gradients;
+        DCHECK_GT(batchGradients.size(),0);
 		int nvars = static_cast<int>(variables.size());
-		CHECK_EQ(nvars, gradients.size());
+        
+        DCHECK_EQ(nvars,batchGradients[0].size());
+        for(int i = 0; i < nvars; i++) {
+            gradients.push_back(batchGradients[0][i]);
+        }
+        for(int i = 1; i < batchGradients.size(); i++) {
+            CHECK_EQ(nvars, batchGradients[i].size());
+            for(int j = 0; j < nvars; j++) {
+                gradients[j].tensorPadRight<T, Tensor::MAX_DIMS>() = gradients[j].tensorPadRight<T,Tensor::MAX_DIMS>() + batchGradients[i][j].tensorPadRight<T, Tensor::MAX_DIMS>();
+            }
+        }
+        for(int i = 0; i < nvars; i++) {
+            gradients[i].tensorPadRight<T, Tensor::MAX_DIMS>() = gradients[i].tensorPadRight<T,Tensor::MAX_DIMS>() / static_cast<T>(batchGradients.size());
+        }
 //        if(newDeltaWeights_.size() != gradients.size()) {
 //            for(int i = 0; i < gradients.size(); i++) {
 //                newDeltaWeights_.push_back(gradients[i].scalarMult<T>(1.0f - momentum_));

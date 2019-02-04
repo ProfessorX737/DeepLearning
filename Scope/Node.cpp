@@ -24,11 +24,11 @@ DataType Node::dataType() const {
 }
 
 void Node::evalGradients(std::unordered_map<int,Tensor>& nodeTensorMap, const std::vector<std::vector<int>>& paths,
-                         std::vector<Tensor>& inOutGrads) const {
+                         std::vector<Tensor>& inOutGrads, int batchIndex) const {
     DCHECK_EQ(inOutGrads.size(),paths.size()) << "outGrads vector must contain same number of tensors"
                                             << " as number of paths";
     for(int i = 0; i < paths.size(); i++) {
-        evalDeriv(inOutGrads[i], nodeTensorMap, paths[i], 0);
+        evalDeriv(inOutGrads[i], nodeTensorMap, paths[i], 0, batchIndex);
     }
 }
 

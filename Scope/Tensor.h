@@ -124,6 +124,9 @@ public:
 
 	template<typename T, size_t NDIMS>
 	typename MTTypes<T, NDIMS>::Tensor shaped(const dim_init_list& new_dims) const;
+    
+    template<typename T>
+    void sharedCopyInit(const Tensor& other, int batchIndex);
 
 private:
 	class TensorBuffer {
@@ -134,6 +137,7 @@ private:
 		}
 		void allocate(size_t num_bytes);
 		void* data;
+        bool ownsData = false;
 	private:
 		void free();
 	};
@@ -286,6 +290,24 @@ typename MTTypes<T, NDIMS>::Tensor Tensor::shaped(const dim_init_list& new_dims)
 template<typename T> 
 Tensor operator*(const T scalar, const Tensor& t) {
 	return t * scalar;
+}
+
+template<typename T>
+void Tensor::sharedCopyInit(const Tensor& other, int batchIndex) {
+    if((batchIndex < 0) || (other.numDims() < 2)) {
+        sharedCopyInit(other);
+        return;
+    }
+    DCHECK_LT(batchIndex, other.dimSize(0));
+    dt_ = other.dataType();
+    int batchSize = 1;
+    shape_.addDim(1);
+    for(int i = 1; i < other.numDims(); i++) {
+        batchSize *= other.dimSize(i);
+        shape_.addDim(other.dimSize(i));
+    }
+    DCHECK_EQ(buffer_->ownsData, false);
+    buffer_->data = other.data<T>() + (batchIndex * batchSize);
 }
 
 #include "Multiply.h"

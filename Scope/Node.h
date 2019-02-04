@@ -30,14 +30,14 @@ public:
     
     // calculates the derivatives of this node with respect to each variable that make up this node.
     // takes in the nodeTensorMap that is created from the eval(&nodeTensorMap,&out) function.
-    // returns a vector of gradients @outGrads.
+    // returns a vector of gradients @inOutGrads.
     void evalGradients(std::unordered_map<int,Tensor>& nodeTensorMap, const std::vector<std::vector<int>>& paths,
-                       std::vector<Tensor>& inOutGrads) const;
+                       std::vector<Tensor>& inOutGrads, int batchIndex) const;
     
     // only to be overridden in class Op
     // helper recursive function for evalGradients
     virtual void evalDeriv(Tensor& dx, std::unordered_map<int,Tensor>& nodeTensorMap,
-                           const std::vector<int>& path, const int pathIndex) const {}
+                           const std::vector<int>& path, const int pathIndex, int batchIndex) const {}
 
     // returns the output result of this node @out
     // not to be overridden in any new nodes created
@@ -56,6 +56,7 @@ public:
                               std::vector<Tensor>& outVariables) const;
 
 	int getClassId() const { return class_id_; }
+    std::string getClassName() const { return class_name_; }
 	int getId() const { return id_; }
 	int numChildren() const { return static_cast<int>(children_.size()); }
 

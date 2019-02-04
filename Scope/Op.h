@@ -7,12 +7,13 @@
 template<int NOPERANDS>
 struct DerivContext {
     DerivContext(const std::array<Tensor,NOPERANDS>& operands, int wrtIdx,
-                 const std::unordered_map<int,Tensor>& nodeTensorMap)
-    : operands(operands), wrtIdx(wrtIdx), nodeTensorMap(nodeTensorMap) {}
-    
+                 const std::unordered_map<int,Tensor>& nodeTensorMap, int batchIndex)
+    : operands(operands), wrtIdx(wrtIdx), nodeTensorMap(nodeTensorMap), batchIndex(batchIndex) {}
+
     const std::array<Tensor,NOPERANDS>& operands;
     int wrtIdx;
     const std::unordered_map<int,Tensor>& nodeTensorMap;
+    int batchIndex;
 };
 
 template<typename T,int NOPERANDS>
@@ -34,10 +35,10 @@ public:
 
 		std::array<Tensor, NOPERANDS> in;
 		for (int i = 0; i < NOPERANDS; i++) {
-			if (children_[i]->numChildren() == 0) {
-				children_[i]->eval(nodeTensorMap, in[i]);
-			}
-			else {
+//			if (children_[i]->numChildren() == 0) {
+//				children_[i]->eval(nodeTensorMap, in[i]);
+//			}
+//			else {
 				auto it = nodeTensorMap.find(children_[i]->getId());
 				if (it == nodeTensorMap.end()) {
 					children_[i]->eval(nodeTensorMap, in[i]);
@@ -46,7 +47,7 @@ public:
 				else {
 					in[i] = it->second;
 				}
-			}
+//			}
 		}
 		op(in,out);
 	}
@@ -55,13 +56,14 @@ public:
 	}
 
     void evalDeriv(Tensor& dx, std::unordered_map<int,Tensor>& nodeTensorMap,
-                           const std::vector<int>& path, const int pathIndex) const override {
+                           const std::vector<int>& path, const int pathIndex, int batchIndex) const override {
         
         std::array<Tensor, NOPERANDS> in;
         std::array<typename TTypes<T,Tensor::MAX_DIMS>::Tensor, NOPERANDS> in2;
         
 		for (int i = 0; i < NOPERANDS; i++) {
-			if (children_[i]->numChildren() == 0) {
+//			if (children_[i]->numChildren() == 0 /*&& children_[i]->getClassName().compare("Variable")*/) {
+            if(children_[i]->getClassName().compare("Variable") == 0) {
 				children_[i]->eval(nodeTensorMap, in[i]);
 			}
 			else {
@@ -70,15 +72,17 @@ public:
                     LOG(FATAL) << "operand for derivative cannot be found in nodeTensorMap";
 				}
 				else {
-					in[i] = it->second;
+                    Tensor t;
+                    t.sharedCopyInit<T>(it->second, batchIndex);
+					in[i] = t;
 				}
 			}
 		}
         int wrtIdx = path[pathIndex];
-        DerivContext<NOPERANDS> ctx(in,wrtIdx,nodeTensorMap);
+        DerivContext<NOPERANDS> ctx(in,wrtIdx,nodeTensorMap,batchIndex);
         //deriv(dx, in, wrtIdx, nodeTensorMap);
         deriv(dx,ctx);
-        children_[wrtIdx]->evalDeriv(dx, nodeTensorMap, path, pathIndex+1);
+        children_[wrtIdx]->evalDeriv(dx, nodeTensorMap, path, pathIndex+1, batchIndex);
     }
 
 private:
