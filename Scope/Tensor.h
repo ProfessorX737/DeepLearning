@@ -42,8 +42,15 @@ public:
 	Tensor(const dim_init_list& dims, DataType dt = DT_FLOAT);
 	void init(const TensorShape& shape, DataType dt = DT_FLOAT);
 	void init(const dim_init_list& dims, DataType dt = DT_FLOAT);
+    
+    // if allocation space is less than or equal to pre-allocated space
+    // the pre-allocated space is reused
+    void recycle(const TensorShape& shape, DataType dt);
+    
 	void sharedCopyInit(const Tensor& other);
 	void sharedCopyInit(const Tensor& other, const TensorShape& shape);
+    template<typename T>
+    void sharedCopyInit(const Tensor& other, int batchIndex);
 
 	template<typename T> 
 	void fill(const std::initializer_list<T>& init_list);
@@ -124,9 +131,7 @@ public:
 
 	template<typename T, size_t NDIMS>
 	typename MTTypes<T, NDIMS>::Tensor shaped(const dim_init_list& new_dims) const;
-    
-    template<typename T>
-    void sharedCopyInit(const Tensor& other, int batchIndex);
+
 
 private:
 	class TensorBuffer {

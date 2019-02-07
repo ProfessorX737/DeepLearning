@@ -9,7 +9,7 @@ public:
 	typedef Eigen::Index Dim;
 	typedef std::initializer_list<Dim> dim_init_list;
 
-	TensorShape() : num_elements_(1) {}
+	TensorShape() : num_elements_(0) {}
 	TensorShape(const dim_init_list& dims);
 	void init(const dim_init_list& dims);
 	~TensorShape() {}
@@ -17,7 +17,7 @@ public:
 	void addDim(Dim d);
 	int numDims() const { return static_cast<int>(dims_.size()); }
 	int dimSize(int i) const;
-	int numElements() const { return num_elements_; }
+    int numElements() const;
 	std::string dimString() const;
 	bool isSameShape(const TensorShape& other) const;
 

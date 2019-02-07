@@ -8,8 +8,9 @@ public:
 
 	void unaryOp(const Tensor& in, Tensor& out) const override {
 		out.init(in.shape(), in.dataType());
-		auto outVec = out.asVec<T>();
-		outVec = in.asVec<T>().array().tanh().matrix();
+//		auto outVec = out.asVec<T>();
+//		outVec = in.asVec<T>().array().tanh().matrix();
+        out.asVec<T>() = in.asVec<T>().array().tanh().matrix();
 	}
     void deriv(Tensor& dx, DerivContext<1>& ctx) const override {
 		CHECK_EQ(ctx.wrtIdx, 0);

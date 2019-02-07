@@ -32,12 +32,12 @@ public:
     // takes in the nodeTensorMap that is created from the eval(&nodeTensorMap,&out) function.
     // returns a vector of gradients @inOutGrads.
     void evalGradients(std::unordered_map<int,Tensor>& nodeTensorMap, const std::vector<std::vector<int>>& paths,
-                       std::vector<Tensor>& inOutGrads, int batchIndex) const;
+                       std::vector<Tensor>& inOutGrads, int batchIndex);
     
     // only to be overridden in class Op
     // helper recursive function for evalGradients
     virtual void evalDeriv(Tensor& dx, std::unordered_map<int,Tensor>& nodeTensorMap,
-                           const std::vector<int>& path, const int pathIndex, int batchIndex) const {}
+                           const std::vector<int>& path, const int pathIndex, int batchIndex) {}
 
     // returns the output result of this node @out
     // not to be overridden in any new nodes created

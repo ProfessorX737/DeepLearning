@@ -35,8 +35,6 @@ public:
 private:
 	float learningRate_;
     float momentum_ = 0.5f;
-    std::vector<Tensor> oldDeltaWeights_;
-
 };
 
 inline NodePtr GradientDescent(Graph& graph, NodePtr minimize, const float learningRate) {

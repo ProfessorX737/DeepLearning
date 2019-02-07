@@ -19,19 +19,31 @@ Tensor::Tensor(const dim_init_list& dims, DataType dt) {
 }
 
 void Tensor::init(const TensorShape& shape, DataType dt) {
-	shape_ = std::move(shape);
-	dt_ = dt;
-	buffer_ = std::make_shared<TensorBuffer>();
-    dt_size_ = DataTypeSize::v(dt_);
-	buffer_->allocate(numElements()*dt_size_);
+    if(!shape_.isSameShape(shape) || dt_ != dt) {
+    	dt_ = dt;
+        dt_size_ = DataTypeSize::v(dt_);
+    	buffer_ = std::make_shared<TensorBuffer>();
+    	buffer_->allocate(shape.numElements()*dt_size_);
+        //std::cout << "calling expensive tensor allocate" << std::endl;
+    	shape_ = std::move(shape);
+    }
+}
+
+void Tensor::recycle(const TensorShape& shape, DataType dt) {
+    if(!shape_.isSameShape(shape) || dt_ != dt) {
+    	dt_ = dt;
+        dt_size_ = DataTypeSize::v(dt_);
+        if(numElements() < shape.numElements()) {
+        	buffer_ = std::make_shared<TensorBuffer>();
+        	buffer_->allocate(shape.numElements()*dt_size_);
+        }
+    	shape_ = std::move(shape);
+    }
 }
 
 void Tensor::init(const dim_init_list& dims, DataType dt) {
-	shape_.init(dims);
-	dt_ = dt;
-	buffer_ = std::make_shared<TensorBuffer>();
-    dt_size_ = DataTypeSize::v(dt_);
-	buffer_->allocate(numElements()*dt_size_);
+    TensorShape shape(dims);
+    init(shape,dt);
 }
 
 void Tensor::sharedCopyInit(const Tensor& other) {
@@ -39,6 +51,7 @@ void Tensor::sharedCopyInit(const Tensor& other) {
 }
 
 void Tensor::sharedCopyInit(const Tensor& other, const TensorShape& shape) {
+    //std::cout << shape.numElements() << " " << other.numElements() << std::endl;
 	CHECK_EQ(shape.numElements(), other.numElements());
 	dt_ = other.dataType();
 	buffer_ = other.buffer_;

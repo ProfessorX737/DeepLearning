@@ -33,7 +33,7 @@ public:
 	}
 	void eval(std::unordered_map<int,Tensor>& nodeTensorMap, Tensor& out) override {
 
-		std::array<Tensor, NOPERANDS> in;
+		//std::array<Tensor, NOPERANDS> in;
 		for (int i = 0; i < NOPERANDS; i++) {
 //			if (children_[i]->numChildren() == 0) {
 //				children_[i]->eval(nodeTensorMap, in[i]);
@@ -41,28 +41,27 @@ public:
 //			else {
 				auto it = nodeTensorMap.find(children_[i]->getId());
 				if (it == nodeTensorMap.end()) {
-					children_[i]->eval(nodeTensorMap, in[i]);
-					nodeTensorMap[children_[i]->getId()] = in[i];
+					children_[i]->eval(nodeTensorMap, in_[i]);
+					nodeTensorMap[children_[i]->getId()] = in_[i];
 				}
 				else {
-					in[i] = it->second;
+					in_[i] = it->second;
 				}
 //			}
 		}
-		op(in,out);
+		op(in_,out);
 	}
 	DataType dataType() const override {
 		return (NOPERANDS == 0) ? DT_INVALID : children_[0]->dataType();
 	}
 
     void evalDeriv(Tensor& dx, std::unordered_map<int,Tensor>& nodeTensorMap,
-                           const std::vector<int>& path, const int pathIndex, int batchIndex) const override {
+                           const std::vector<int>& path, const int pathIndex, int batchIndex) override {
         
         std::array<Tensor, NOPERANDS> in;
-        std::array<typename TTypes<T,Tensor::MAX_DIMS>::Tensor, NOPERANDS> in2;
+        //std::array<typename TTypes<T,Tensor::MAX_DIMS>::Tensor, NOPERANDS> in2;
         
 		for (int i = 0; i < NOPERANDS; i++) {
-//			if (children_[i]->numChildren() == 0 /*&& children_[i]->getClassName().compare("Variable")*/) {
             if(children_[i]->getClassName().compare("Variable") == 0) {
 				children_[i]->eval(nodeTensorMap, in[i]);
 			}
@@ -86,6 +85,7 @@ public:
     }
 
 private:
+    std::array<Tensor,NOPERANDS> in_;
 	virtual void op(const std::array<Tensor,NOPERANDS>& in, Tensor& out) const = 0;
 //    virtual void deriv(Tensor& dx, const std::array<Tensor, NOPERANDS>& in, int wrtIdx,
 //                       const std::unordered_map<int,Tensor>& nodeTensorMap) const = 0;

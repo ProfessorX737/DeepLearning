@@ -51,7 +51,7 @@ public:
 		auto bcols = b.dimSize(ndims - 1);
 
 		// size of the batch dim is equal to product of all dim sizes except last two
-		TensorShape::Dim nbatch = out_shape.numElements();
+        TensorShape::Dim nbatch = out_shape.numElements() == 0 ? 1 : out_shape.numElements();
 
 		// make reshaped a & b that have most 3 dims
 		Tensor rA, rB, rOut;
