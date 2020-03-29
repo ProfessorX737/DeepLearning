@@ -120,7 +120,7 @@ int main(void) {
 	const int I = 2;
 	const int H = 2;
 	const int O = 1;
-	const int BATCH_SIZE = 2;
+	const int BATCH_SIZE = 10;
 
 	// get all our data and store into tensors
 	Tensor data({ BATCH_SIZE,I }, DT_DOUBLE);
@@ -159,7 +159,7 @@ int main(void) {
 //    cout << out[0].asVec<double>() << endl;
 
     //auto optimizer = std::make_shared<MomentumDescentOp<double>>(graph,error,0.25f,0.5f);
-    auto optimizer = MomentumDescent(graph, error, 0.2f, 0.5f);
+    auto optimizer = MomentumDescent(graph, error, 0.3f, 0.5f);
    // auto optimizer = GradientDescent(graph, error, 0.35f);
     auto reduce = ReduceMean<0>(graph,optimizer);
     //auto sgd = GradientDescent(graph, error, 0.5f);
