@@ -25,7 +25,7 @@ Graph graph;
 ```
 The graph is where we will build up a representation of the neural network
 Create placeholder objects that will hold the training data. Placeholders are objects holding data that change every iteration.
-```
+```c++
 auto x = Placeholder(graph, { BATCH_SIZE, 2 }, DT_DOUBLE);
 auto y = Placeholder(graph, { BATCH_SIZE, 1 }, DT_DOUBLE);
 ```
