@@ -11,12 +11,14 @@ Tensor data({ BATCH_SIZE, 2 }, DT_DOUBLE);
 Tensor label({ BATCH_SIZE, 1 }, DT_DOUBLE);
 ```
 XOR example data
+
 | data 1 | data 2 | label |
 | ------- | ------- | ----- |
 | 0 | 0 | 0 |
 | 0 | 1 | 1 |
 | 1 | 0 | 1 |
 | 1 | 1 | 0 |
+
 Intatiate our graph like so
 ```c++
 Graph graph;
